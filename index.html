@@ -14,42 +14,51 @@
             <button id="play-pause-all">Play All</button>
         </div>
 
-        <!-- Track list with titles, controls, and waveforms -->
-        <div class="track" id="soprano">
-            <h3>Soprano</h3>
-            <div class="controls">
-                <button class="mute" data-track="soprano">Mute</button>
-                <button class="solo" data-track="soprano">Solo</button>
-            </div>
-            <div class="waveform" id="wave-soprano"></div>
-        </div>
+        <div class="track-list">
+            <!-- Left side: Track titles and buttons -->
+            <div class="track-controls">
+                <div class="track" id="soprano">
+                    <h3>Soprano</h3>
+                    <div class="controls">
+                        <button class="mute" data-track="soprano">Mute</button>
+                        <button class="solo" data-track="soprano">Solo</button>
+                    </div>
+                </div>
 
-        <div class="track" id="alto">
-            <h3>Alto</h3>
-            <div class="controls">
-                <button class="mute" data-track="alto">Mute</button>
-                <button class="solo" data-track="alto">Solo</button>
-            </div>
-            <div class="waveform" id="wave-alto"></div>
-        </div>
+                <div class="track" id="alto">
+                    <h3>Alto</h3>
+                    <div class="controls">
+                        <button class="mute" data-track="alto">Mute</button>
+                        <button class="solo" data-track="alto">Solo</button>
+                    </div>
+                </div>
 
-        <div class="track" id="tenor">
-            <h3>Tenor</h3>
-            <div class="controls">
-                <button class="mute" data-track="tenor">Mute</button>
-                <button class="solo" data-track="tenor">Solo</button>
-            </div>
-            <div class="waveform" id="wave-tenor"></div>
-        </div>
+                <div class="track" id="tenor">
+                    <h3>Tenor</h3>
+                    <div class="controls">
+                        <button class="mute" data-track="tenor">Mute</button>
+                        <button class="solo" data-track="tenor">Solo</button>
+                    </div>
+                </div>
 
-        <div class="track" id="bass">
-            <h3>Bass</h3>
-            <div class="controls">
-                <button class="mute" data-track="bass">Mute</button>
-                <button class="solo" data-track="bass">Solo</button>
+                <div class="track" id="bass">
+                    <h3>Bass</h3>
+                    <div class="controls">
+                        <button class="mute" data-track="bass">Mute</button>
+                        <button class="solo" data-track="bass">Solo</button>
+                    </div>
+                </div>
             </div>
-            <div class="waveform" id="wave-bass"></div>
+
+            <!-- Right side: Waveforms -->
+            <div class="waveform-container">
+                <div class="waveform" id="wave-soprano"></div>
+                <div class="waveform" id="wave-alto"></div>
+                <div class="waveform" id="wave-tenor"></div>
+                <div class="waveform" id="wave-bass"></div>
+            </div>
         </div>
+        
     </div>
 
     <script src="script.js"></script>
