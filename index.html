@@ -221,6 +221,7 @@
                     } else {
                         slider.value = 0;  // Mute other tracks
                         audio.volume = 0; // Mute audio for other tracks
+                        muteButton.classList.add('active');  // Ensure mute button is active for muted tracks
                     }
                 } else {
                     if (!muteButton.classList.contains('active')) {
