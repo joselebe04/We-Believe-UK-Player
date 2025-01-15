@@ -171,9 +171,10 @@
         const currentTimeDisplay = document.querySelector('.current-time');
         const progressBars = document.querySelectorAll('.progress');
         const waveforms = document.querySelectorAll('.waveform');
-        
+        const volumeSliders = document.querySelectorAll('.volume-slider');
+
         let isPlaying = false;
-        
+
         playPauseButton.addEventListener('click', () => {
             if (isPlaying) {
                 audioElements.forEach(audio => audio.pause());
@@ -184,61 +185,71 @@
             }
             isPlaying = !isPlaying;
         });
-        
+
         muteButtons.forEach((button, index) => {
             button.addEventListener('click', () => {
-                const audio = audioElements[index];
-                audio.muted = !audio.muted;
-                button.classList.toggle('active');
+                const slider = volumeSliders[index];
+                if (slider.value > 0) {
+                    slider.value = 0;
+                    button.classList.add('active');
+                } else {
+                    slider.value = 1;
+                    button.classList.remove('active');
+                }
             });
         });
-        
+
         soloButtons.forEach((button, index) => {
             button.addEventListener('click', () => {
                 button.classList.toggle('active');
                 updateSoloStates();
             });
         });
-        
+
         function updateSoloStates() {
             const activeSoloButtons = Array.from(soloButtons).filter(button => button.classList.contains('active'));
             audioElements.forEach((audio, index) => {
+                const slider = volumeSliders[index];
                 if (activeSoloButtons.length > 0) {
-                    audio.muted = !soloButtons[index].classList.contains('active');
+                    if (soloButtons[index].classList.contains('active')) {
+                        slider.value = 1;  // Allow soloed track to play at full volume
+                    } else {
+                        slider.value = 0;  // Mute other tracks
+                    }
                 } else {
-                    audio.muted = false;
+                    slider.value = 1;  // All tracks unmuted if no solo is active
                 }
             });
         }
-        
+
         audioElements.forEach((audio, index) => {
             audio.addEventListener('timeupdate', () => {
                 const currentTime = Math.floor(audio.currentTime);
                 const minutes = Math.floor(currentTime / 60);
                 const seconds = currentTime % 60;
                 currentTimeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        
+
                 const progress = (audio.currentTime / audio.duration) * 100;
                 progressBars[index].style.left = `${progress}%`;
             });
         });
-        
+
         waveforms.forEach((waveform) => {
             waveform.addEventListener('click', (e) => {
                 const rect = waveform.getBoundingClientRect();
                 const clickX = e.clientX - rect.left;
                 const clickPercentage = clickX / rect.width;
-        
+
                 const newTime = clickPercentage * audioElements[0].duration;
-        
+
                 // Pause all tracks first
                 const previouslyPlaying = isPlaying; // Remember if tracks were playing
-        
+
                 // Update `currentTime` for all tracks
                 audioElements.forEach(audio => {
                     audio.currentTime = newTime;
                 });
-        
+
                 // If tracks were playing before, resume playback on all tracks
                 if (previouslyPlaying) {
                     audioElements.forEach(audio => audio.play());
