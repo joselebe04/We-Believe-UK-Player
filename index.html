@@ -159,6 +159,7 @@
         const volumeSliders = document.querySelectorAll('.volume-slider');
     
         let isPlaying = false;
+        let seeking = false; // Flag to detect manual seeking
     
         playPauseButton.addEventListener('click', () => {
             if (isPlaying) {
@@ -176,12 +177,6 @@
                 const slider = volumeSliders[index];
                 const isTrackMuted = slider.value === '0';
 
-                const currentTime = audioElements[0].currentTime;
-                audioElements.forEach(audio => {
-                    audio.pause();
-                    audio.currentTime = currentTime;
-                });
-
                 if (isTrackMuted) {
                     slider.value = 1;
                     audioElements[index].volume = 1;
@@ -190,14 +185,6 @@
                     slider.value = 0;
                     audioElements[index].volume = 0;
                     button.classList.add('active');
-                }
-
-                if (isPlaying) {
-                    setTimeout(() => {
-                        audioElements.forEach(audio => {
-                            audio.play().catch(error => console.error('Playback error:', error));
-                        });
-                    }, 100);
                 }
             });
         });
@@ -227,7 +214,25 @@
             });
         });
 
+        waveforms.forEach((waveform, index) => {
+            waveform.addEventListener('mousedown', (e) => {
+                seeking = true;
+                const rect = waveform.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const clickPercentage = clickX / rect.width;
+                const newTime = clickPercentage * audioElements[0].duration;
+
+                audioElements.forEach(audio => {
+                    audio.currentTime = newTime;
+                });
+
+                seeking = false;
+            });
+        });
+
         function checkAndSyncTracks() {
+            if (seeking) return; // Skip syncing while seeking
+
             let maxTime = 0;
 
             audioElements.forEach(audio => {
