@@ -210,18 +210,9 @@
     
                 const progress = (audio.currentTime / audio.duration) * 100;
                 progressBars[index].style.left = `${progress}%`;
-            });
     
-            // Fail-safe: Ensure all tracks stay in sync during playback
-            audio.addEventListener('timeupdate', () => {
-                const currentTime = audio.currentTime;
-    
-                // Resync if any track is out of sync by more than 0.1 seconds
-                audioElements.forEach(otherAudio => {
-                    if (Math.abs(currentTime - otherAudio.currentTime) > 0.1) {
-                        otherAudio.currentTime = currentTime; // Sync with the current track
-                    }
-                });
+                // Fail-safe check for sync
+                checkSync();
             });
         });
     
@@ -244,28 +235,33 @@
                     audio.currentTime = newTime;
                 });
     
-                // Create a Promise that resolves when all tracks have completed seeking
-                const seekPromises = audioElements.map(audio => {
-                    return new Promise(resolve => {
-                        audio.addEventListener('seeked', resolve, { once: true });
-                    });
-                });
-    
-                // Ensure playback resumes only once all tracks are synced
-                Promise.all(seekPromises).then(() => {
-                    // Wait a longer delay before resuming playback
-                    setTimeout(() => {
-                        if (isPlaying) {
-                            audioElements.forEach(audio => {
-                                audio.play().catch(error => {
-                                    console.error('Playback failed:', error);
-                                });
+                // Apply a delay before resuming playback
+                setTimeout(() => {
+                    if (isPlaying) {
+                        audioElements.forEach(audio => {
+                            audio.play().catch(error => {
+                                console.error('Playback failed:', error);
                             });
-                        }
-                    }, 500); // Increase the delay to 500ms (or adjust as needed)
-                });
+                        });
+                    }
+                }, 300); // 300ms delay before resuming
             });
         });
+    
+        function checkSync() {
+            let currentTimes = Array.from(audioElements).map(audio => audio.currentTime);
+            let minTime = Math.min(...currentTimes);
+            let maxTime = Math.max(...currentTimes);
+    
+            // If the difference is greater than a threshold, adjust to the same position
+            if (maxTime - minTime > 0.1) { // 100ms threshold
+                audioElements.forEach(audio => {
+                    if (Math.abs(audio.currentTime - minTime) > 0.1) {
+                        audio.currentTime = minTime; // Sync to the earliest time
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>
