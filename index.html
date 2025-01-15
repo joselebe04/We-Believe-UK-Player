@@ -75,7 +75,7 @@
             background-color: #e0e0e0;
             height: 20px;
             flex-grow: 1;
-            margin: 0 5px; /* Reduce margin on the left and right to bring it closer */
+            margin: 0 5px;
             cursor: pointer;
         }
 
@@ -174,45 +174,39 @@
         muteButtons.forEach((button, index) => {
             button.addEventListener('click', () => {
                 const slider = volumeSliders[index];
-                const isTrackMuted = slider.value === '0'; // Check if the track is muted
-        
-                // Pause all tracks momentarily to sync
-                const currentTime = audioElements[0].currentTime; // Sync to this timestamp
+                const isTrackMuted = slider.value === '0';
+
+                const currentTime = audioElements[0].currentTime;
                 audioElements.forEach(audio => {
                     audio.pause();
-                    audio.currentTime = currentTime; // Sync all tracks
+                    audio.currentTime = currentTime;
                 });
-        
+
                 if (isTrackMuted) {
-                    // Unmute the track
                     slider.value = 1;
                     audioElements[index].volume = 1;
                     button.classList.remove('active');
                 } else {
-                    // Mute the track
                     slider.value = 0;
                     audioElements[index].volume = 0;
                     button.classList.add('active');
                 }
-        
-                // Resume playback if it was playing before
+
                 if (isPlaying) {
                     setTimeout(() => {
                         audioElements.forEach(audio => {
                             audio.play().catch(error => console.error('Playback error:', error));
                         });
-                    }, 100); // Small delay to ensure synchronization
+                    }, 100);
                 }
             });
         });
 
-    
         volumeSliders.forEach((slider, index) => {
             slider.addEventListener('input', () => {
                 const volume = slider.value;
                 audioElements[index].volume = volume;
-    
-                // If the slider value is greater than 0, unmute the track
+
                 if (volume > 0) {
                     muteButtons[index].classList.remove('active');
                 } else {
@@ -220,51 +214,36 @@
                 }
             });
         });
-    
-        // Update current time and progress bar as audio plays
+
         audioElements.forEach((audio, index) => {
             audio.addEventListener('timeupdate', () => {
                 const currentTime = Math.floor(audio.currentTime);
                 const minutes = Math.floor(currentTime / 60);
                 const seconds = currentTime % 60;
                 currentTimeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    
+
                 const progress = (audio.currentTime / audio.duration) * 100;
                 progressBars[index].style.left = `${progress}%`;
             });
         });
-    
-        // Sync all tracks when user clicks on waveform
-        waveforms.forEach((waveform, index) => {
-            waveform.addEventListener('click', (e) => {
-                const rect = waveform.getBoundingClientRect();
-                const clickX = e.clientX - rect.left;
-                const clickPercentage = clickX / rect.width;
-    
-                const newTime = clickPercentage * audioElements[0].duration;
-    
-                // Pause all tracks before syncing
-                audioElements.forEach(audio => {
-                    audio.pause();
-                });
-    
-                // Sync all tracks to the new time position
-                audioElements.forEach(audio => {
-                    audio.currentTime = newTime;
-                });
-    
-                // Apply a delay before resuming playback
-                setTimeout(() => {
-                    if (isPlaying) {
-                        audioElements.forEach(audio => {
-                            audio.play().catch(error => {
-                                console.error('Playback failed:', error);
-                            });
-                        });
-                    }
-                }, 500); // 300ms delay before resuming
+
+        function checkAndSyncTracks() {
+            let maxTime = 0;
+
+            audioElements.forEach(audio => {
+                if (!audio.paused) {
+                    maxTime = Math.max(maxTime, audio.currentTime);
+                }
             });
-        });
+
+            audioElements.forEach(audio => {
+                if (Math.abs(audio.currentTime - maxTime) > 0.1) {
+                    audio.currentTime = maxTime;
+                }
+            });
+        }
+
+        setInterval(checkAndSyncTracks, 500);
     </script>
 </body>
 </html>
