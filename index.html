@@ -223,17 +223,26 @@
             });
         });
 
-        waveforms.forEach((waveform, index) => {
+        waveforms.forEach((waveform) => {
             waveform.addEventListener('click', (e) => {
                 const rect = waveform.getBoundingClientRect();
                 const clickX = e.clientX - rect.left;
                 const clickPercentage = clickX / rect.width;
 
-                const newTime = clickPercentage * audioElements[index].duration;
+                const newTime = clickPercentage * audioElements[0].duration;
 
+                // Pause all tracks first
+                audioElements.forEach(audio => audio.pause());
+
+                // Update `currentTime` for all tracks
                 audioElements.forEach(audio => {
                     audio.currentTime = newTime;
                 });
+
+                // Play all tracks again to ensure sync
+                if (isPlaying) {
+                    audioElements.forEach(audio => audio.play());
+                }
             });
         });
     </script>
