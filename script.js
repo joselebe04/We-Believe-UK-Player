@@ -27,10 +27,10 @@ const waveforms = {
 };
 
 // Load audio files
-waveforms.soprano.load('tracks/soprano.mp3');
-waveforms.alto.load('tracks/alto.mp3');
-waveforms.tenor.load('tracks/tenor.mp3');
-waveforms.bass.load('tracks/bass.mp3');
+waveforms.soprano.load('Tracks/Soprano.mp3');
+waveforms.alto.load('Tracks/Alto.mp3');
+waveforms.tenor.load('Tracks/Tenor.mp3');
+waveforms.bass.load('Tracks/Bass.mp3');
 
 // Control functions
 const tracks = waveforms;
