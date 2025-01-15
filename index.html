@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choir Practice Tool</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/wavesurfer.js"></script>
+</head>
+<body>
+  <header>
+    <h1></h1>
+    <p></p>
+  </header>
+
+  <main>
+    <section class="track" id="soprano">
+      <h2>Soprano</h2>
+      <div id="waveform-soprano"></div>
+      <div class="controls">
+        <button onclick="playPause('soprano')">Play/Pause</button>
+        <button onclick="muteToggle('soprano')">Mute</button>
+        <button onclick="solo('soprano')">Solo</button>
+        <input type="range" min="0" max="1" step="0.01" onchange="adjustVolume('soprano', this.value)" title="Volume">
+        <button onclick="loopToggle('soprano')">Loop</button>
+      </div>
+    </section>
+
+    <section class="track" id="alto">
+      <h2>Alto</h2>
+      <div id="waveform-alto"></div>
+      <div class="controls">
+        <button onclick="playPause('alto')">Play/Pause</button>
+        <button onclick="muteToggle('alto')">Mute</button>
+        <button onclick="solo('alto')">Solo</button>
+        <input type="range" min="0" max="1" step="0.01" onchange="adjustVolume('alto', this.value)" title="Volume">
+        <button onclick="loopToggle('alto')">Loop</button>
+      </div>
+    </section>
+
+    <section class="track" id="tenor">
+      <h2>Tenor</h2>
+      <div id="waveform-tenor"></div>
+      <div class="controls">
+        <button onclick="playPause('tenor')">Play/Pause</button>
+        <button onclick="muteToggle('tenor')">Mute</button>
+        <button onclick="solo('tenor')">Solo</button>
+        <input type="range" min="0" max="1" step="0.01" onchange="adjustVolume('tenor', this.value)" title="Volume">
+        <button onclick="loopToggle('tenor')">Loop</button>
+      </div>
+    </section>
+
+    <section class="track" id="bass">
+      <h2>Bass</h2>
+      <div id="waveform-bass"></div>
+      <div class="controls">
+        <button onclick="playPause('bass')">Play/Pause</button>
+        <button onclick="muteToggle('bass')">Mute</button>
+        <button onclick="solo('bass')">Solo</button>
+        <input type="range" min="0" max="1" step="0.01" onchange="adjustVolume('bass', this.value)" title="Volume">
+        <button onclick="loopToggle('bass')">Loop</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Choir Practice Tool. All rights reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
