@@ -27,28 +27,12 @@ const waveforms = {
 };
 
 // Load audio files
-waveforms.soprano.load('Tracks/Soprano.mp3');
-waveforms.alto.load('Tracks/Alto.mp3');
-waveforms.tenor.load('Tracks/Tenor.mp3');
-waveforms.bass.load('Tracks/Bass.mp3');
+waveforms.soprano.load('tracks/soprano.mp3');
+waveforms.alto.load('tracks/alto.mp3');
+waveforms.tenor.load('tracks/tenor.mp3');
+waveforms.bass.load('tracks/bass.mp3');
 
 // Control functions
-function playAll() {
-  Object.keys(tracks).forEach((key) => {
-    if (!tracks[key].isPlaying()) {
-      tracks[key].play();
-    }
-  });
-}
-
-function pauseAll() {
-  Object.keys(tracks).forEach((key) => {
-    if (tracks[key].isPlaying()) {
-      tracks[key].pause();
-    }
-  });
-}
-
 const tracks = waveforms;
 function playPause(track) {
   const waveform = tracks[track];
@@ -74,9 +58,8 @@ function adjustVolume(track, value) {
 
 function loopToggle(track) {
   const waveform = tracks[track];
-  const isLooping = waveform.loop || false; // Check if already looping
-  waveform.loop = !isLooping; // Toggle looping
-  alert(`${track} loop is now ${waveform.loop ? "enabled" : "disabled"}`);
+  const loopEnabled = waveform.getLoop();
+  waveform.setLoop(!loopEnabled);
 }
 
 // Event listeners for volume and UI updates
