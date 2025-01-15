@@ -33,6 +33,22 @@ waveforms.tenor.load('Tracks/Tenor.mp3');
 waveforms.bass.load('Tracks/Bass.mp3');
 
 // Control functions
+function playAll() {
+  Object.keys(tracks).forEach((key) => {
+    if (!tracks[key].isPlaying()) {
+      tracks[key].play();
+    }
+  });
+}
+
+function pauseAll() {
+  Object.keys(tracks).forEach((key) => {
+    if (tracks[key].isPlaying()) {
+      tracks[key].pause();
+    }
+  });
+}
+
 const tracks = waveforms;
 function playPause(track) {
   const waveform = tracks[track];
