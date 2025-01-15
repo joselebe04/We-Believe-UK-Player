@@ -150,91 +150,89 @@
     </div>
 
     <script>
-        const playPauseButton = document.querySelector('.play-pause-button');
-        const audioElements = document.querySelectorAll('.audio');
-        const muteButtons = document.querySelectorAll('.mute');
-        const currentTimeDisplay = document.querySelector('.current-time');
-        const progressBars = document.querySelectorAll('.progress');
-        const waveforms = document.querySelectorAll('.waveform');
-        const volumeSliders = document.querySelectorAll('.volume-slider');
-
-        let isPlaying = false;
-
-        playPauseButton.addEventListener('click', () => {
-            if (isPlaying) {
-                audioElements.forEach(audio => audio.pause());
-                playPauseButton.textContent = 'Play';
-            } else {
-                audioElements.forEach(audio => audio.play());
-                playPauseButton.textContent = 'Pause';
-            }
-            isPlaying = !isPlaying;
-        });
-
-        muteButtons.forEach((button, index) => {
-            button.addEventListener('click', () => {
-                const slider = volumeSliders[index];
-                if (slider.value > 0) {
-                    slider.value = 0;
-                    audioElements[index].volume = 0; // Mute the track
-                    button.classList.add('active');
+       <script>
+            const playPauseButton = document.querySelector('.play-pause-button');
+            const audioElements = document.querySelectorAll('.audio');
+            const muteButtons = document.querySelectorAll('.mute');
+            const currentTimeDisplay = document.querySelector('.current-time');
+            const progressBars = document.querySelectorAll('.progress');
+            const waveforms = document.querySelectorAll('.waveform');
+            const volumeSliders = document.querySelectorAll('.volume-slider');
+        
+            let isPlaying = false;
+        
+            playPauseButton.addEventListener('click', () => {
+                if (isPlaying) {
+                    audioElements.forEach(audio => audio.pause());
+                    playPauseButton.textContent = 'Play';
                 } else {
-                    slider.value = 1;
-                    audioElements[index].volume = 1; // Unmute the track
-                    button.classList.remove('active');
-                }
-            });
-        });
-
-        volumeSliders.forEach((slider, index) => {
-            slider.addEventListener('input', () => {
-                const volume = slider.value;
-                audioElements[index].volume = volume;
-
-                // If the slider value is greater than 0, unmute the track
-                if (volume > 0) {
-                    muteButtons[index].classList.remove('active');
-                } else {
-                    muteButtons[index].classList.add('active');
-                }
-            });
-        });
-
-        // Update current time and progress bar as audio plays
-        audioElements.forEach((audio, index) => {
-            audio.addEventListener('timeupdate', () => {
-                const currentTime = Math.floor(audio.currentTime);
-                const minutes = Math.floor(currentTime / 60);
-                const seconds = currentTime % 60;
-                currentTimeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-
-                const progress = (audio.currentTime / audio.duration) * 100;
-                progressBars[index].style.left = `${progress}%`;
-            });
-        });
-
-        waveforms.forEach((waveform) => {
-            waveform.addEventListener('click', (e) => {
-                const rect = waveform.getBoundingClientRect();
-                const clickX = e.clientX - rect.left;
-                const clickPercentage = clickX / rect.width;
-
-                const newTime = clickPercentage * audioElements[0].duration;
-
-                // Pause all tracks first
-                const previouslyPlaying = isPlaying; // Remember if tracks were playing
-
-                // Update `currentTime` for all tracks
-                audioElements.forEach(audio => {
-                    audio.currentTime = newTime;
-                });
-
-                // If tracks were playing before, resume playback on all tracks
-                if (previouslyPlaying) {
                     audioElements.forEach(audio => audio.play());
+                    playPauseButton.textContent = 'Pause';
                 }
+                isPlaying = !isPlaying;
             });
-        });
+        
+            muteButtons.forEach((button, index) => {
+                button.addEventListener('click', () => {
+                    const slider = volumeSliders[index];
+                    if (slider.value > 0) {
+                        slider.value = 0;
+                        audioElements[index].volume = 0; // Mute the track
+                        button.classList.add('active');
+                    } else {
+                        slider.value = 1;
+                        audioElements[index].volume = 1; // Unmute the track
+                        button.classList.remove('active');
+                    }
+                });
+            });
+        
+            volumeSliders.forEach((slider, index) => {
+                slider.addEventListener('input', () => {
+                    const volume = slider.value;
+                    audioElements[index].volume = volume;
+        
+                    // If the slider value is greater than 0, unmute the track
+                    if (volume > 0) {
+                        muteButtons[index].classList.remove('active');
+                    } else {
+                        muteButtons[index].classList.add('active');
+                    }
+                });
+            });
+        
+            // Update current time and progress bar as audio plays
+            audioElements.forEach((audio, index) => {
+                audio.addEventListener('timeupdate', () => {
+                    const currentTime = Math.floor(audio.currentTime);
+                    const minutes = Math.floor(currentTime / 60);
+                    const seconds = currentTime % 60;
+                    currentTimeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+                    const progress = (audio.currentTime / audio.duration) * 100;
+                    progressBars[index].style.left = `${progress}%`;
+                });
+            });
+        
+            waveforms.forEach((waveform, index) => {
+                waveform.addEventListener('click', (e) => {
+                    const rect = waveform.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const clickPercentage = clickX / rect.width;
+        
+                    const newTime = clickPercentage * audioElements[0].duration;
+        
+                    // Sync all tracks to the new time position
+                    audioElements.forEach(audio => {
+                        audio.currentTime = newTime;
+                    });
+        
+                    // If tracks were playing before, resume playback on all tracks
+                    if (isPlaying) {
+                        audioElements.forEach(audio => audio.play());
+                    }
+                });
+            });
     </script>
 </body>
 </html>
