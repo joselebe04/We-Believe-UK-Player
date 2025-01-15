@@ -1,72 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Choir Practice Tool</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://unpkg.com/wavesurfer.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choir Player</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
-    <h1></h1>
-    <p></p>
-  </header>
+    <div class="track" id="soprano">
+        <h3>Soprano</h3>
+        <div class="controls">
+            <button class="play-pause" data-track="soprano">Play</button>
+            <button class="mute-solo" data-track="soprano">Mute</button>
+            <input type="range" class="volume" data-track="soprano" value="100" />
+        </div>
+        <div class="waveform" id="wave-soprano"></div>
+    </div>
 
-  <main>
+    <div class="track" id="alto">
+        <h3>Alto</h3>
+        <div class="controls">
+            <button class="play-pause" data-track="alto">Play</button>
+            <button class="mute-solo" data-track="alto">Mute</button>
+            <input type="range" class="volume" data-track="alto" value="100" />
+        </div>
+        <div class="waveform" id="wave-alto"></div>
+    </div>
 
-    <button onclick="playAll()">Play All</button>
-    <button onclick="pauseAll()">Pause All</button>
-  
-    <section class="track" id="soprano">
-      <h2>Soprano</h2>
-      <div id="waveform-soprano"></div>
-      <div class="controls">
-        <button onclick="playPause('soprano')">Play/Pause</button>
-        <button onclick="muteToggle('soprano')">Mute</button>
-        <button onclick="solo('soprano')">Solo</button>
-        <input type="range" min="0" max="1" step="0.01" onchange="adjustVolume('soprano', this.value)" title="Volume">
-      </div>
-    </section>
+    <div class="track" id="tenor">
+        <h3>Tenor</h3>
+        <div class="controls">
+            <button class="play-pause" data-track="tenor">Play</button>
+            <button class="mute-solo" data-track="tenor">Mute</button>
+            <input type="range" class="volume" data-track="tenor" value="100" />
+        </div>
+        <div class="waveform" id="wave-tenor"></div>
+    </div>
 
-    <section class="track" id="alto">
-      <h2>Alto</h2>
-      <div id="waveform-alto"></div>
-      <div class="controls">
-        <button onclick="playPause('alto')">Play/Pause</button>
-        <button onclick="muteToggle('alto')">Mute</button>
-        <button onclick="solo('alto')">Solo</button>
-        <input type="range" min="0" max="1" step="0.01" onchange="adjustVolume('alto', this.value)" title="Volume">
-      </div>
-    </section>
+    <div class="track" id="bass">
+        <h3>Bass</h3>
+        <div class="controls">
+            <button class="play-pause" data-track="bass">Play</button>
+            <button class="mute-solo" data-track="bass">Mute</button>
+            <input type="range" class="volume" data-track="bass" value="100" />
+        </div>
+        <div class="waveform" id="wave-bass"></div>
+    </div>
 
-    <section class="track" id="tenor">
-      <h2>Tenor</h2>
-      <div id="waveform-tenor"></div>
-      <div class="controls">
-        <button onclick="playPause('tenor')">Play/Pause</button>
-        <button onclick="muteToggle('tenor')">Mute</button>
-        <button onclick="solo('tenor')">Solo</button>
-        <input type="range" min="0" max="1" step="0.01" onchange="adjustVolume('tenor', this.value)" title="Volume">
-      </div>
-    </section>
-
-    <section class="track" id="bass">
-      <h2>Bass</h2>
-      <div id="waveform-bass"></div>
-      <div class="controls">
-        <button onclick="playPause('bass')">Play/Pause</button>
-        <button onclick="muteToggle('bass')">Mute</button>
-        <button onclick="solo('bass')">Solo</button>
-        <input type="range" min="0" max="1" step="0.01" onchange="adjustVolume('bass', this.value)" title="Volume">
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <p>&copy; 2025 Choir Practice Tool. All rights reserved.</p>
-  </footer>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
