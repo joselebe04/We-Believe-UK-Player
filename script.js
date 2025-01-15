@@ -1,10 +1,11 @@
 const tracks = {
-    soprano: { audio: new Audio('Tracks/Soprano.mp3'), isPlaying: false, isMuted: false, volume: 1 },
-    alto: { audio: new Audio('Tracks/Alto.mp3'), isPlaying: false, isMuted: false, volume: 1 },
-    tenor: { audio: new Audio('Tracks/Tenor.mp3'), isPlaying: false, isMuted: false, volume: 1 },
-    bass: { audio: new Audio('Tracks/Bass.mp3'), isPlaying: false, isMuted: false, volume: 1 }
+    soprano: { audio: new Audio('Tracks/Soprano.mp3'), isPlaying: false, isMuted: false, isSolo: false, volume: 1 },
+    alto: { audio: new Audio('Tracks/Alto.mp3'), isPlaying: false, isMuted: false, isSolo: false, volume: 1 },
+    tenor: { audio: new Audio('Tracks/Tenor.mp3'), isPlaying: false, isMuted: false, isSolo: false, volume: 1 },
+    bass: { audio: new Audio('Tracks/Bass.mp3'), isPlaying: false, isMuted: false, isSolo: false, volume: 1 }
 };
 
+// Initialize waveforms
 const createWaveform = (trackName) => {
     const waveformElement = document.getElementById(`wave-${trackName}`);
     const wave = WaveSurfer.create({
@@ -18,7 +19,6 @@ const createWaveform = (trackName) => {
     return wave;
 };
 
-// Initialize waveforms
 const waves = {
     soprano: createWaveform('soprano'),
     alto: createWaveform('alto'),
@@ -26,75 +26,63 @@ const waves = {
     bass: createWaveform('bass')
 };
 
-document.querySelectorAll('.play-pause').forEach(button => {
-    button.addEventListener('click', () => {
-        const trackName = button.dataset.track;
-        const track = tracks[trackName];
+// Single Play/Pause button for all tracks
+document.getElementById('play-pause-all').addEventListener('click', () => {
+    const allPlaying = Object.values(tracks).every(track => track.isPlaying);
 
-        // Toggle play/pause for this track
-        if (track.isPlaying) {
-            track.audio.pause();
-            button.textContent = 'Play';
-        } else {
-            track.audio.play();
-            button.textContent = 'Pause';
-        }
-        track.isPlaying = !track.isPlaying;
+    // Toggle play/pause for all tracks
+    if (allPlaying) {
+        Object.values(tracks).forEach(track => track.audio.pause());
+        document.getElementById('play-pause-all').textContent = 'Play All';
+    } else {
+        Object.values(tracks).forEach(track => track.audio.play());
+        document.getElementById('play-pause-all').textContent = 'Pause All';
+    }
 
-        // Sync all tracks
-        syncTracks();
-    });
+    // Update play state
+    Object.values(tracks).forEach(track => track.isPlaying = !allPlaying);
 });
 
-document.querySelectorAll('.mute-solo').forEach(button => {
+// Mute/solo buttons
+document.querySelectorAll('.mute').forEach(button => {
     button.addEventListener('click', () => {
         const trackName = button.dataset.track;
         const track = tracks[trackName];
 
-        // Toggle mute/solo
+        // Toggle mute
         if (track.isMuted) {
             track.audio.muted = false;
             button.textContent = 'Mute';
         } else {
             track.audio.muted = true;
-            button.textContent = 'Solo';
+            button.textContent = 'Unmute';
         }
         track.isMuted = !track.isMuted;
-
-        // Sync all tracks
-        syncTracks();
     });
 });
 
-document.querySelectorAll('.volume').forEach(slider => {
-    slider.addEventListener('input', (event) => {
-        const trackName = event.target.dataset.track;
+document.querySelectorAll('.solo').forEach(button => {
+    button.addEventListener('click', () => {
+        const trackName = button.dataset.track;
         const track = tracks[trackName];
-        track.audio.volume = event.target.value / 100;
-        track.volume = track.audio.volume;
+
+        // Toggle solo
+        if (track.isSolo) {
+            track.audio.muted = false;
+            button.textContent = 'Solo';
+        } else {
+            track.audio.muted = true;
+            button.textContent = 'Unsolo';
+        }
+        track.isSolo = !track.isSolo;
+
+        // Muting other tracks when solo is active
+        if (track.isSolo) {
+            Object.values(tracks).forEach(otherTrack => {
+                if (otherTrack !== track) otherTrack.audio.muted = true;
+            });
+        } else {
+            Object.values(tracks).forEach(otherTrack => otherTrack.audio.muted = otherTrack.isMuted);
+        }
     });
 });
-
-// Function to sync all tracks
-function syncTracks() {
-    const isAnyTrackPlaying = Object.values(tracks).some(track => track.isPlaying);
-    const isAnyTrackMuted = Object.values(tracks).some(track => track.isMuted);
-
-    // Play/pause all tracks
-    if (isAnyTrackPlaying) {
-        Object.values(tracks).forEach(track => {
-            if (track.isPlaying && track.audio.paused) track.audio.play();
-        });
-    } else {
-        Object.values(tracks).forEach(track => track.audio.pause());
-    }
-
-    // Mute/solo all tracks
-    if (isAnyTrackMuted) {
-        Object.values(tracks).forEach(track => {
-            if (!track.isMuted) track.audio.muted = true;
-        });
-    } else {
-        Object.values(tracks).forEach(track => track.audio.muted = false);
-    }
-}
