@@ -96,11 +96,10 @@
             background-color: red;
         }
 
-        .time-stamps {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 5px;
-            font-size: 12px;
+        .current-time {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 10px;
             color: #333;
         }
     </style>
@@ -108,6 +107,8 @@
 <body>
     <div class="player-container">
         <button class="play-pause-button">Play</button>
+
+        <div class="current-time">0:00</div>
 
         <div class="track">
             <span class="track-title">Soprano</span>
@@ -119,7 +120,7 @@
                 <button class="solo">Solo</button>
             </div>
             <input type="range" class="volume-slider" min="0" max="1" step="0.01">
-            <audio class="audio" src="soprano.mp3"></audio> <-- Tracks/Soprano.mp3 -->
+            <audio class="audio" src="soprano.mp3"></audio>
         </div>
 
         <div class="track">
@@ -132,7 +133,7 @@
                 <button class="solo">Solo</button>
             </div>
             <input type="range" class="volume-slider" min="0" max="1" step="0.01">
-            <audio class="audio" src="alto.mp3"></audio> <-- Tracks/Alto.mp3 -->
+            <audio class="audio" src="alto.mp3"></audio>
         </div>
 
         <div class="track">
@@ -145,7 +146,7 @@
                 <button class="solo">Solo</button>
             </div>
             <input type="range" class="volume-slider" min="0" max="1" step="0.01">
-            <audio class="audio" src="tenor.mp3"></audio> <-- Tracks/Tenor.mp3 -->
+            <audio class="audio" src="tenor.mp3"></audio>
         </div>
 
         <div class="track">
@@ -158,37 +159,66 @@
                 <button class="solo">Solo</button>
             </div>
             <input type="range" class="volume-slider" min="0" max="1" step="0.01">
-            <audio class="audio" src="bass.mp3"></audio> <-- Tracks/Bass.mp3 -->
-        </div>
-
-        <div class="time-stamps">
-            <span>0:00</span>
-            <span>0:10</span>
-            <span>0:20</span>
-            <span>0:30</span>
-            <span>...</span>
+            <audio class="audio" src="bass.mp3"></audio>
         </div>
     </div>
 
     <script>
         const playPauseButton = document.querySelector('.play-pause-button');
+        const audioElements = document.querySelectorAll('.audio');
         const muteButtons = document.querySelectorAll('.mute');
         const soloButtons = document.querySelectorAll('.solo');
+        const currentTimeDisplay = document.querySelector('.current-time');
+        const progressBars = document.querySelectorAll('.progress');
+
+        let isPlaying = false;
 
         playPauseButton.addEventListener('click', () => {
-            const isPlaying = playPauseButton.textContent === 'Pause';
-            playPauseButton.textContent = isPlaying ? 'Play' : 'Pause';
+            if (isPlaying) {
+                audioElements.forEach(audio => audio.pause());
+                playPauseButton.textContent = 'Play';
+            } else {
+                audioElements.forEach(audio => audio.play());
+                playPauseButton.textContent = 'Pause';
+            }
+            isPlaying = !isPlaying;
         });
 
-        muteButtons.forEach(button => {
+        muteButtons.forEach((button, index) => {
             button.addEventListener('click', () => {
+                const audio = audioElements[index];
+                audio.muted = !audio.muted;
                 button.classList.toggle('active');
             });
         });
 
-        soloButtons.forEach(button => {
+        soloButtons.forEach((button, index) => {
             button.addEventListener('click', () => {
                 button.classList.toggle('active');
+                updateSoloStates();
+            });
+        });
+
+        function updateSoloStates() {
+            const activeSoloButtons = Array.from(soloButtons).filter(button => button.classList.contains('active'));
+            audioElements.forEach((audio, index) => {
+                if (activeSoloButtons.length > 0) {
+                    audio.muted = !soloButtons[index].classList.contains('active');
+                } else {
+                    audio.muted = false;
+                }
+            });
+        }
+
+        audioElements.forEach((audio, index) => {
+            audio.addEventListener('timeupdate', () => {
+                const currentTime = Math.floor(audio.currentTime);
+                const minutes = Math.floor(currentTime / 60);
+                const seconds = currentTime % 60;
+                currentTimeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                const progress = (audio.currentTime / audio.duration) * 100;
+                progressBars[index].style.left = `${progress}%`;
             });
         });
     </script>
