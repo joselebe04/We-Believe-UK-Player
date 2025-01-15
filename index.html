@@ -210,14 +210,18 @@
             const activeSoloButtons = Array.from(soloButtons).filter(button => button.classList.contains('active'));
             audioElements.forEach((audio, index) => {
                 const slider = volumeSliders[index];
+                const muteButton = muteButtons[index];
                 if (activeSoloButtons.length > 0) {
                     if (soloButtons[index].classList.contains('active')) {
                         slider.value = 1;  // Allow soloed track to play at full volume
+                        muteButton.classList.remove('active');  // Ensure mute button is reset
                     } else {
                         slider.value = 0;  // Mute other tracks
                     }
                 } else {
-                    slider.value = 1;  // All tracks unmuted if no solo is active
+                    if (!muteButton.classList.contains('active')) {
+                        slider.value = 1;  // All tracks unmuted if no solo is active
+                    }
                 }
             });
         }
