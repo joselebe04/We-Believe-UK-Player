@@ -1,7 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choir Practice Tool</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/wavesurfer.js"></script>
+</head>
+<body>
+  <header>
+    <h1></h1>
+    <p></p>
+  </header>
 
-  <main>
+<div class="controls">
+<button onclick="playAll()">Play All</button>
+<button onclick="pauseAll()">Pause All</button>
     
     <section class="track" id="soprano">
       <h2>Soprano</h2>
@@ -51,10 +65,6 @@
 </div>
     </section>
   </main>
-  
-<div class="controls">
-<button onclick="playAll()">Play All</button>
-<button onclick="pauseAll()">Pause All</button>
   
   <footer>
     <p>&copy; 2025 Choir Practice Tool. All rights reserved.</p>
