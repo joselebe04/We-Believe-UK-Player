@@ -174,17 +174,38 @@
         muteButtons.forEach((button, index) => {
             button.addEventListener('click', () => {
                 const slider = volumeSliders[index];
-                if (slider.value > 0) {
-                    slider.value = 0;
-                    audioElements[index].volume = 0; // Mute the track
-                    button.classList.add('active');
-                } else {
+                const isTrackMuted = slider.value === '0'; // Check if the track is muted
+        
+                // Pause all tracks momentarily to sync
+                const currentTime = audioElements[0].currentTime; // Sync to this timestamp
+                audioElements.forEach(audio => {
+                    audio.pause();
+                    audio.currentTime = currentTime; // Sync all tracks
+                });
+        
+                if (isTrackMuted) {
+                    // Unmute the track
                     slider.value = 1;
-                    audioElements[index].volume = 1; // Unmute the track
+                    audioElements[index].volume = 1;
                     button.classList.remove('active');
+                } else {
+                    // Mute the track
+                    slider.value = 0;
+                    audioElements[index].volume = 0;
+                    button.classList.add('active');
+                }
+        
+                // Resume playback if it was playing before
+                if (isPlaying) {
+                    setTimeout(() => {
+                        audioElements.forEach(audio => {
+                            audio.play().catch(error => console.error('Playback error:', error));
+                        });
+                    }, 100); // Small delay to ensure synchronization
                 }
             });
         });
+
     
         volumeSliders.forEach((slider, index) => {
             slider.addEventListener('input', () => {
