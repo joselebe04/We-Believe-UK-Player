@@ -234,6 +234,11 @@
     
                 const newTime = clickPercentage * audioElements[0].duration;
     
+                // Pause all tracks before syncing
+                audioElements.forEach(audio => {
+                    audio.pause();
+                });
+    
                 // Sync all tracks to the new time position
                 audioElements.forEach(audio => {
                     audio.currentTime = newTime;
@@ -245,7 +250,7 @@
                         audio.addEventListener('seeked', resolve, { once: true });
                     });
                 })).then(() => {
-                    // If tracks were playing before, resume playback on all tracks
+                    // Resume playback on all tracks only after they are synced
                     if (isPlaying) {
                         audioElements.forEach(audio => audio.play());
                     }
