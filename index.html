@@ -191,9 +191,11 @@
                 const slider = volumeSliders[index];
                 if (slider.value > 0) {
                     slider.value = 0;
+                    audioElements[index].volume = 0; // Mute the track
                     button.classList.add('active');
                 } else {
                     slider.value = 1;
+                    audioElements[index].volume = 1; // Unmute the track
                     button.classList.remove('active');
                 }
             });
@@ -214,18 +216,22 @@
                 if (activeSoloButtons.length > 0) {
                     if (soloButtons[index].classList.contains('active')) {
                         slider.value = 1;  // Allow soloed track to play at full volume
+                        audio.volume = 1; // Ensure audio volume is reset for soloed track
                         muteButton.classList.remove('active');  // Ensure mute button is reset
                     } else {
                         slider.value = 0;  // Mute other tracks
+                        audio.volume = 0; // Mute audio for other tracks
                     }
                 } else {
                     if (!muteButton.classList.contains('active')) {
                         slider.value = 1;  // All tracks unmuted if no solo is active
+                        audio.volume = 1; // Unmute the track
                     }
                 }
             });
         }
 
+        // Update current time and progress bar as audio plays
         audioElements.forEach((audio, index) => {
             audio.addEventListener('timeupdate', () => {
                 const currentTime = Math.floor(audio.currentTime);
