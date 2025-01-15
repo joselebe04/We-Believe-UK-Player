@@ -4,48 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Choir Player</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/wavesurfer.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/wavesurfer.js"></script> <!-- Wavesurfer.js Library -->
 </head>
 <body>
-    <div class="track" id="soprano">
-        <h3>Soprano</h3>
-        <div class="controls">
-            <button class="play-pause" data-track="soprano">Play</button>
-            <button class="mute-solo" data-track="soprano">Mute</button>
-            <input type="range" class="volume" data-track="soprano" value="100" />
+    <div class="container">
+        <!-- Play/Pause button for all tracks -->
+        <div class="play-pause-container">
+            <button id="play-pause-all">Play All</button>
         </div>
-        <div class="waveform" id="wave-soprano"></div>
-    </div>
 
-    <div class="track" id="alto">
-        <h3>Alto</h3>
-        <div class="controls">
-            <button class="play-pause" data-track="alto">Play</button>
-            <button class="mute-solo" data-track="alto">Mute</button>
-            <input type="range" class="volume" data-track="alto" value="100" />
+        <!-- Track list with titles, controls, and waveforms -->
+        <div class="track" id="soprano">
+            <h3>Soprano</h3>
+            <div class="controls">
+                <button class="mute" data-track="soprano">Mute</button>
+                <button class="solo" data-track="soprano">Solo</button>
+            </div>
+            <div class="waveform" id="wave-soprano"></div>
         </div>
-        <div class="waveform" id="wave-alto"></div>
-    </div>
 
-    <div class="track" id="tenor">
-        <h3>Tenor</h3>
-        <div class="controls">
-            <button class="play-pause" data-track="tenor">Play</button>
-            <button class="mute-solo" data-track="tenor">Mute</button>
-            <input type="range" class="volume" data-track="tenor" value="100" />
+        <div class="track" id="alto">
+            <h3>Alto</h3>
+            <div class="controls">
+                <button class="mute" data-track="alto">Mute</button>
+                <button class="solo" data-track="alto">Solo</button>
+            </div>
+            <div class="waveform" id="wave-alto"></div>
         </div>
-        <div class="waveform" id="wave-tenor"></div>
-    </div>
 
-    <div class="track" id="bass">
-        <h3>Bass</h3>
-        <div class="controls">
-            <button class="play-pause" data-track="bass">Play</button>
-            <button class="mute-solo" data-track="bass">Mute</button>
-            <input type="range" class="volume" data-track="bass" value="100" />
+        <div class="track" id="tenor">
+            <h3>Tenor</h3>
+            <div class="controls">
+                <button class="mute" data-track="tenor">Mute</button>
+                <button class="solo" data-track="tenor">Solo</button>
+            </div>
+            <div class="waveform" id="wave-tenor"></div>
         </div>
-        <div class="waveform" id="wave-bass"></div>
+
+        <div class="track" id="bass">
+            <h3>Bass</h3>
+            <div class="controls">
+                <button class="mute" data-track="bass">Mute</button>
+                <button class="solo" data-track="bass">Solo</button>
+            </div>
+            <div class="waveform" id="wave-bass"></div>
+        </div>
     </div>
 
     <script src="script.js"></script>
