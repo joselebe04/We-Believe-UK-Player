@@ -1,8 +1,8 @@
 const tracks = {
-    soprano: { audio: new Audio('soprano.mp3'), isPlaying: false, isMuted: false, volume: 1 },
-    alto: { audio: new Audio('alto.mp3'), isPlaying: false, isMuted: false, volume: 1 },
-    tenor: { audio: new Audio('tenor.mp3'), isPlaying: false, isMuted: false, volume: 1 },
-    bass: { audio: new Audio('bass.mp3'), isPlaying: false, isMuted: false, volume: 1 }
+    soprano: { audio: new Audio('Tracks/Soprano.mp3'), isPlaying: false, isMuted: false, volume: 1 },
+    alto: { audio: new Audio('Tracks/Alto.mp3'), isPlaying: false, isMuted: false, volume: 1 },
+    tenor: { audio: new Audio('Tracks/Tenor.mp3'), isPlaying: false, isMuted: false, volume: 1 },
+    bass: { audio: new Audio('Tracks/Bass.mp3'), isPlaying: false, isMuted: false, volume: 1 }
 };
 
 const createWaveform = (trackName) => {
