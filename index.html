@@ -253,16 +253,16 @@
     
                 // Ensure playback resumes only once all tracks are synced
                 Promise.all(seekPromises).then(() => {
-                    // Explicitly trigger play after seeking is complete
-                    if (isPlaying) {
-                        // Delay the playback start to avoid issues with some browsers
-                        audioElements.forEach(audio => {
-                            audio.play().catch(error => {
-                                // Handle any errors that may arise when play is called programmatically
-                                console.error('Playback failed:', error);
+                    // Wait a longer delay before resuming playback
+                    setTimeout(() => {
+                        if (isPlaying) {
+                            audioElements.forEach(audio => {
+                                audio.play().catch(error => {
+                                    console.error('Playback failed:', error);
+                                });
                             });
-                        });
-                    }
+                        }
+                    }, 500); // Increase the delay to 500ms (or adjust as needed)
                 });
             });
         });
