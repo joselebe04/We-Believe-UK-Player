@@ -245,12 +245,15 @@
                 });
     
                 // Wait for seeked event on all tracks before playing
-                Promise.all(audioElements.map(audio => {
+                const syncPromises = audioElements.map(audio => {
                     return new Promise(resolve => {
                         audio.addEventListener('seeked', resolve, { once: true });
                     });
-                })).then(() => {
-                    // Resume playback on all tracks only after they are synced
+                });
+    
+                // Only resume playback once all tracks are in sync
+                Promise.all(syncPromises).then(() => {
+                    // Check if tracks were previously playing and resume only after sync
                     if (isPlaying) {
                         audioElements.forEach(audio => audio.play());
                     }
