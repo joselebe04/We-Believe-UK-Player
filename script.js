@@ -58,8 +58,9 @@ function adjustVolume(track, value) {
 
 function loopToggle(track) {
   const waveform = tracks[track];
-  const loopEnabled = waveform.getLoop();
-  waveform.setLoop(!loopEnabled);
+  const isLooping = waveform.loop || false; // Check if already looping
+  waveform.loop = !isLooping; // Toggle looping
+  alert(`${track} loop is now ${waveform.loop ? "enabled" : "disabled"}`);
 }
 
 // Event listeners for volume and UI updates
