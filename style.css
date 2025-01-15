@@ -9,7 +9,7 @@ body {
 }
 
 header {
-  background-color: #4CAF50;
+  background-color: #225588;
   color: white;
   padding: 20px;
 }
@@ -42,7 +42,7 @@ main {
 .track h2 {
   margin-bottom: 10px;
   font-size: 1.5em;
-  color: #4CAF50;
+  color: #225588;
 }
 
 #waveform-soprano,
@@ -64,7 +64,7 @@ main {
 }
 
 button {
-  background-color: #4CAF50;
+  background-color: #225588;
   color: white;
   border: none;
   padding: 10px 15px;
@@ -74,7 +74,7 @@ button {
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: #225588;
 }
 
 input[type="range"] {
