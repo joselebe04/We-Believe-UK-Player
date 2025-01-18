@@ -1,236 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Choir Audio Player</title>
-    <script src="https://unpkg.com/wavesurfer.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            color: #333;
-        }
-
-        .audio-player {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 10px;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            align-items: center;
-        }
-
-        .track {
-            margin-bottom: 10px;
-        }
-
-        .waveform-container {
-            display: flex;
-            align-items: center;
-            position: relative;
-            height: 60px;
-        }
-
-        .waveform {
-            flex: 1;
-            margin-left: 10px;
-            position: relative;
-        }
-
-        .volume-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-left: 10px;
-        }
-
-        .volume-container input[type="range"] {
-            width: 100px;
-            margin-top: 10px;
-        }
-
-        .mute-btn {
-            background-color: #225588;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 5px 10px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .mute-btn.muted {
-            background-color: #888;
-        }
-
-        .play-btn {
-            background-color: #225588;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 8px 16px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .play-btn.paused {
-            background-color: #888;
-        }
-
-        .timestamp {
-            font-size: 14px;
-            text-align: right;
-            color: #666;
-        }
-
-        .locator-line {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 2px;
-            background-color: #225588;
-            z-index: 1;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choir Player</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/wavesurfer.js"></script>
 </head>
 <body>
-    <div class="audio-player">
-        <div class="controls">
-            <button id="playPauseBtn" class="play-btn">Play</button>
-            <span id="timestamp" class="timestamp">0:00</span>
+  <div id="audio-player">
+    <div id="controls">
+      <button id="play-pause-btn">Play</button>
+      <div id="volume-controls">
+        <div>
+          <label for="soprano-volume">Soprano Volume</label>
+          <input type="range" id="soprano-volume" min="0" max="1" step="0.01" value="1">
+          <button id="soprano-mute">Mute</button>
         </div>
-        <div id="tracksContainer"></div>
+        <div>
+          <label for="alto-volume">Alto Volume</label>
+          <input type="range" id="alto-volume" min="0" max="1" step="0.01" value="1">
+          <button id="alto-mute">Mute</button>
+        </div>
+        <div>
+          <label for="tenor-volume">Tenor Volume</label>
+          <input type="range" id="tenor-volume" min="0" max="1" step="0.01" value="1">
+          <button id="tenor-mute">Mute</button>
+        </div>
+        <div>
+          <label for="bass-volume">Bass Volume</label>
+          <input type="range" id="bass-volume" min="0" max="1" step="0.01" value="1">
+          <button id="bass-mute">Mute</button>
+        </div>
+      </div>
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const playPauseBtn = document.getElementById("playPauseBtn");
-            const timestamp = document.getElementById("timestamp");
-            const tracksContainer = document.getElementById("tracksContainer");
+    <div id="waveform-container">
+      <div id="soprano-waveform"></div>
+      <div id="alto-waveform"></div>
+      <div id="tenor-waveform"></div>
+      <div id="bass-waveform"></div>
+    </div>
 
-            const trackData = [
-                { name: "Soprano", file: "Tracks/Soprano.mp3" },
-                { name: "Alto", file: "Tracks/Alto.mp3" },
-                { name: "Tenor", file: "Tracks/Tenor.mp3" },
-                { name: "Bass", file: "Tracks/Bass.mp3" }
-            ];
+    <div id="time-stamp">00:00</div>
+  </div>
 
-            let waveSurfers = {};
-            let isPlaying = false;
-            let syncInterval;
-
-            const createTrackElement = (track) => {
-                const trackElement = document.createElement("div");
-                trackElement.className = "track";
-
-                const trackHeader = document.createElement("span");
-                trackHeader.textContent = track.name;
-                trackElement.appendChild(trackHeader);
-
-                const waveformContainer = document.createElement("div");
-                waveformContainer.className = "waveform-container";
-
-                const muteBtn = document.createElement("button");
-                muteBtn.className = "mute-btn";
-                muteBtn.textContent = "Mute";
-                muteBtn.dataset.track = track.name.toLowerCase();
-                waveformContainer.appendChild(muteBtn);
-
-                const waveformDiv = document.createElement("div");
-                waveformDiv.className = "waveform";
-                waveformDiv.id = `waveform-${track.name.toLowerCase()}`;
-                waveformContainer.appendChild(waveformDiv);
-
-                const volumeContainer = document.createElement("div");
-                volumeContainer.className = "volume-container";
-
-                const volumeSlider = document.createElement("input");
-                volumeSlider.type = "range";
-                volumeSlider.min = 0;
-                volumeSlider.max = 100;
-                volumeSlider.value = 100;
-                volumeSlider.dataset.track = track.name.toLowerCase();
-                volumeContainer.appendChild(volumeSlider);
-
-                waveformContainer.appendChild(volumeContainer);
-                trackElement.appendChild(waveformContainer);
-
-                tracksContainer.appendChild(trackElement);
-
-                return { muteBtn, volumeSlider, waveformDiv };
-            };
-
-            trackData.forEach((track) => {
-                const { muteBtn, volumeSlider, waveformDiv } = createTrackElement(track);
-
-                const waveSurfer = WaveSurfer.create({
-                    container: `#${waveformDiv.id}`,
-                    waveColor: "#ccc",
-                    progressColor: "#225588",
-                    height: 60,
-                    responsive: true,
-                });
-
-                waveSurfer.load(track.file);
-                waveSurfers[track.name.toLowerCase()] = waveSurfer;
-
-                muteBtn.addEventListener("click", () => {
-                    waveSurfer.setMute(!waveSurfer.getMute());
-                    muteBtn.textContent = waveSurfer.getMute() ? "Unmute" : "Mute";
-                });
-
-                volumeSlider.addEventListener("input", (e) => {
-                    waveSurfer.setVolume(e.target.value / 100);
-                });
-            });
-
-            const syncTracks = () => {
-                const currentTime = waveSurfers.soprano.getCurrentTime();
-                Object.values(waveSurfers).forEach((waveSurfer) => {
-                    if (!waveSurfer.isPlaying()) {
-                        waveSurfer.play();
-                    }
-                    waveSurfer.seekTo(currentTime / waveSurfer.getDuration());
-                });
-
-                const minutes = Math.floor(currentTime / 60);
-                const seconds = Math.floor(currentTime % 60).toString().padStart(2, "0");
-                timestamp.textContent = `${minutes}:${seconds}`;
-            };
-
-            playPauseBtn.addEventListener("click", () => {
-                isPlaying = !isPlaying;
-                playPauseBtn.textContent = isPlaying ? "Pause" : "Play";
-
-                if (isPlaying) {
-                    Object.values(waveSurfers).forEach((waveSurfer) => waveSurfer.play());
-                    syncInterval = setInterval(syncTracks, 500);
-                } else {
-                    Object.values(waveSurfers).forEach((waveSurfer) => waveSurfer.pause());
-                    clearInterval(syncInterval);
-                }
-            });
-
-            // Create a locator line
-            const locatorLine = document.createElement("div");
-            locatorLine.className = "locator-line";
-            tracksContainer.appendChild(locatorLine);
-        });
-    </script>
+  <script src="script.js"></script>
 </body>
 </html>
