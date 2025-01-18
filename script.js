@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const sopranoAudio = new Audio('soprano.mp3');
-  const altoAudio = new Audio('alto.mp3');
-  const tenorAudio = new Audio('tenor.mp3');
-  const bassAudio = new Audio('bass.mp3');
+  const sopranoAudio = new Audio('Tracks/Soprano.mp3');
+  const altoAudio = new Audio('Tracks/Alto.mp3');
+  const tenorAudio = new Audio('Tracks/Tenor.mp3');
+  const bassAudio = new Audio('Tracks/Bass.mp3');
 
   const sopranoWaveform = WaveSurfer.create({
     container: '#soprano-waveform',
