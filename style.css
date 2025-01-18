@@ -1,16 +1,49 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
-    padding: 20px;
-  }
-  .track {
-    margin-bottom: 20px;
-  }
-  button {
-    margin-right: 10px;
-  }
-  input[type="range"] {
-    vertical-align: middle;
-  }
-  
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  color: #225588;
+  margin-bottom: 30px;
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin: 10px auto;
+  max-width: 600px;
+}
+
+.track strong {
+  flex: 2;
+  text-align: left;
+}
+
+button {
+  flex: 1;
+  padding: 5px 10px;
+  margin: 0 5px;
+  background-color: #225588;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #1a456d;
+}
+
+input[type="range"] {
+  flex: 3;
+  margin-left: 10px;
+}
