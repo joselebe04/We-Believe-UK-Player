@@ -1,105 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Choir Player</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/7.0.0/wavesurfer.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choir Audio Player</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .audio-player {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .track {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .waveform-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .waveform {
+            flex: 1;
+            height: 40px;
+            margin-left: 10px;
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        .waveform:hover {
+            background: #225588;
+            cursor: pointer;
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .volume-container input[type="range"] {
+            margin-left: 10px;
+            flex: 1;
+        }
+
+        .mute-btn {
+            background-color: #225588;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .mute-btn.muted {
+            background-color: #888;
+        }
+
+        .play-btn {
+            background-color: #225588;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .play-btn.paused {
+            background-color: #888;
+        }
+
+        .timestamp {
+            font-size: 12px;
+            text-align: right;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
-  <h1>Choir Player</h1>
-  <div id="tracks"></div>
+    <div class="audio-player">
+        <div class="controls">
+            <button id="playPauseBtn" class="play-btn">Play</button>
+            <span id="timestamp" class="timestamp">0:00</span>
+        </div>
+        
+        <div id="tracksContainer">
+            <div class="track" id="soprano">
+                <span>Soprano</span>
+                <div class="waveform-container">
+                    <button class="mute-btn" data-track="soprano">Mute</button>
+                    <div class="waveform" data-track="soprano"></div>
+                </div>
+                <div class="volume-container">
+                    <input type="range" class="volume-slider" data-track="soprano" min="0" max="100" value="100">
+                </div>
+            </div>
+            
+            <div class="track" id="alto">
+                <span>Alto</span>
+                <div class="waveform-container">
+                    <button class="mute-btn" data-track="alto">Mute</button>
+                    <div class="waveform" data-track="alto"></div>
+                </div>
+                <div class="volume-container">
+                    <input type="range" class="volume-slider" data-track="alto" min="0" max="100" value="100">
+                </div>
+            </div>
 
-  <script>
-    // Fetch the track configuration
-    fetch('tracks.json')
-      .then(response => response.json())
-      .then(data => initPlayer(data));
+            <div class="track" id="tenor">
+                <span>Tenor</span>
+                <div class="waveform-container">
+                    <button class="mute-btn" data-track="tenor">Mute</button>
+                    <div class="waveform" data-track="tenor"></div>
+                </div>
+                <div class="volume-container">
+                    <input type="range" class="volume-slider" data-track="tenor" min="0" max="100" value="100">
+                </div>
+            </div>
 
-// JavaScript Code with requested changes
+            <div class="track" id="bass">
+                <span>Bass</span>
+                <div class="waveform-container">
+                    <button class="mute-btn" data-track="bass">Mute</button>
+                    <div class="waveform" data-track="bass"></div>
+                </div>
+                <div class="volume-container">
+                    <input type="range" class="volume-slider" data-track="bass" min="0" max="100" value="100">
+                </div>
+            </div>
+        </div>
+    </div>
 
-      function initPlayer(tracks) {
-        const container = document.getElementById('tracks');
-        const howls = [];
-        const waveforms = [];
-      
-        // Create UI and initialize Howler and WaveSurfer for each track
-        tracks.forEach((track, index) => {
-          // Create Howl instance
-          const howl = new Howl({
-            src: [track.file],
-            loop: true,
-            volume: 1.0
-          });
-          howls.push(howl);
-      
-          // Create a waveform container
-          const waveformContainer = document.createElement('div');
-          waveformContainer.id = `waveform-${index}`;
-          waveformContainer.style.width = '100%';
-          waveformContainer.style.overflowX = 'scroll';
-          waveformContainer.style.border = '1px solid #ccc';
-          waveformContainer.style.marginTop = '10px';
-      
-          // Create track UI
-          const trackDiv = document.createElement('div');
-          trackDiv.classList.add('track');
-          trackDiv.innerHTML = `
-            <strong>${track.title}</strong>
-            <input data-track="${track.title}" type="range" class="volume" min="0" max="1" step="0.1" value="1">
-          `;
-          trackDiv.appendChild(waveformContainer);
-          container.appendChild(trackDiv);
-      
-          // Initialize WaveSurfer
-          const waveform = WaveSurfer.create({
-            container: `#waveform-${index}`,
-            waveColor: '#ddd',
-            progressColor: '#225588',
-            responsive: true,
-            height: 50,
-            scrollParent: true // Enable scrolling for waveforms
-          });
-          waveform.load(track.file);
-          waveforms.push(waveform);
-      
-          // Synchronize seeking across all tracks
-          waveform.on('seek', (progress) => {
-            const seekTime = progress * howl.duration();
-            howls.forEach(h => h.seek(seekTime));
-            waveforms.forEach(w => w.seekTo(progress));
-          });
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const playPauseBtn = document.getElementById("playPauseBtn");
+            const timestamp = document.getElementById("timestamp");
+            const muteButtons = document.querySelectorAll(".mute-btn");
+            const volumeSliders = document.querySelectorAll(".volume-slider");
+            
+            let isPlaying = false;
+            let tracks = {
+                soprano: new Audio("Tracks/Soprano.mp3"),
+                alto: new Audio("Tracks/Alto.mp3"),
+                tenor: new Audio("Tracks/Tenor.mp3"),
+                bass: new Audio("Tracks/Bass.mp3")
+            };
+
+            const syncTracks = () => {
+                const currentTime = tracks.soprano.currentTime;
+                Object.values(tracks).forEach(track => {
+                    track.currentTime = currentTime;
+                });
+            };
+
+            const updateTimestamp = () => {
+                const minutes = Math.floor(tracks.soprano.currentTime / 60);
+                const seconds = Math.floor(tracks.soprano.currentTime % 60).toString().padStart(2, "0");
+                timestamp.textContent = `${minutes}:${seconds}`;
+            };
+
+            playPauseBtn.addEventListener("click", () => {
+                isPlaying = !isPlaying;
+                playPauseBtn.textContent = isPlaying ? "Pause" : "Play";
+                Object.values(tracks).forEach(track => {
+                    isPlaying ? track.play() : track.pause();
+                });
+                if (isPlaying) {
+                    setInterval(updateTimestamp, 500);
+                }
+            });
+
+            muteButtons.forEach(button => {
+                button.addEventListener("click", (e) => {
+                    const track = tracks[e.target.dataset.track];
+                    const isMuted = track.muted;
+                    track.muted = !isMuted;
+                    e.target.textContent = isMuted ? "Mute" : "Unmute";
+                });
+            });
+
+            volumeSliders.forEach(slider => {
+                slider.addEventListener("input", (e) => {
+                    const track = tracks[e.target.dataset.track];
+                    const volume = e.target.value / 100;
+                    track.volume = volume;
+                    track.muted = volume === 0;
+                    const muteButton = document.querySelector(`.mute-btn[data-track="${e.target.dataset.track}"]`);
+                    muteButton.textContent = volume === 0 ? "Unmute" : "Mute";
+                });
+            });
         });
-      
-        // Create global Play/Pause button
-        const playPauseButton = document.createElement('button');
-        playPauseButton.textContent = 'Play';
-        playPauseButton.style.marginBottom = '20px';
-        playPauseButton.addEventListener('click', () => {
-          const isPlaying = howls.some(h => h.playing());
-          if (isPlaying) {
-            howls.forEach(h => h.pause());
-            playPauseButton.textContent = 'Play';
-          } else {
-            howls.forEach(h => h.play());
-            playPauseButton.textContent = 'Pause';
-          }
-        });
-        container.prepend(playPauseButton);
-      
-        // Volume controls
-        container.addEventListener('input', (e) => {
-          if (e.target.classList.contains('volume')) {
-            const trackName = e.target.dataset.track;
-            const index = tracks.findIndex(t => t.title === trackName);
-            if (index !== -1) {
-              howls[index].volume(parseFloat(e.target.value));
-            }
-          }
-        });
-      }
-  </script>
+    </script>
 </body>
 </html>
