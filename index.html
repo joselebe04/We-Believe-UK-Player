@@ -30,12 +30,12 @@
         .controls {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             align-items: center;
         }
 
         .track {
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
 
         .waveform-container {
@@ -48,19 +48,19 @@
         .waveform {
             flex: 1;
             margin-left: 10px;
+            position: relative;
         }
 
         .volume-container {
             display: flex;
+            flex-direction: column;
             align-items: center;
             margin-left: 10px;
         }
 
         .volume-container input[type="range"] {
-            transform: rotate(-90deg);
-            transform-origin: center;
             width: 100px;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         .mute-btn {
@@ -96,6 +96,16 @@
             text-align: right;
             color: #666;
         }
+
+        .locator-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 2px;
+            background-color: #225588;
+            z-index: 1;
+        }
     </style>
 </head>
 <body>
@@ -122,6 +132,7 @@
 
             let waveSurfers = {};
             let isPlaying = false;
+            let syncInterval;
 
             const createTrackElement = (track) => {
                 const trackElement = document.createElement("div");
@@ -188,21 +199,37 @@
                 });
             });
 
+            const syncTracks = () => {
+                const currentTime = waveSurfers.soprano.getCurrentTime();
+                Object.values(waveSurfers).forEach((waveSurfer) => {
+                    if (!waveSurfer.isPlaying()) {
+                        waveSurfer.play();
+                    }
+                    waveSurfer.seekTo(currentTime / waveSurfer.getDuration());
+                });
+
+                const minutes = Math.floor(currentTime / 60);
+                const seconds = Math.floor(currentTime % 60).toString().padStart(2, "0");
+                timestamp.textContent = `${minutes}:${seconds}`;
+            };
+
             playPauseBtn.addEventListener("click", () => {
                 isPlaying = !isPlaying;
                 playPauseBtn.textContent = isPlaying ? "Pause" : "Play";
 
-                Object.values(waveSurfers).forEach((waveSurfer) => {
-                    isPlaying ? waveSurfer.play() : waveSurfer.pause();
-                });
+                if (isPlaying) {
+                    Object.values(waveSurfers).forEach((waveSurfer) => waveSurfer.play());
+                    syncInterval = setInterval(syncTracks, 500);
+                } else {
+                    Object.values(waveSurfers).forEach((waveSurfer) => waveSurfer.pause());
+                    clearInterval(syncInterval);
+                }
             });
 
-            setInterval(() => {
-                const currentTime = waveSurfers.soprano.getCurrentTime();
-                const minutes = Math.floor(currentTime / 60);
-                const seconds = Math.floor(currentTime % 60).toString().padStart(2, "0");
-                timestamp.textContent = `${minutes}:${seconds}`;
-            }, 500);
+            // Create a locator line
+            const locatorLine = document.createElement("div");
+            locatorLine.className = "locator-line";
+            tracksContainer.appendChild(locatorLine);
         });
     </script>
 </body>
