@@ -18,80 +18,85 @@
       .then(response => response.json())
       .then(data => initPlayer(data));
 
+// JavaScript Code with requested changes
+
       function initPlayer(tracks) {
         const container = document.getElementById('tracks');
-        const howls = {};
-        const waveforms = {};
+        const howls = [];
+        const waveforms = [];
       
+        // Create UI and initialize Howler and WaveSurfer for each track
         tracks.forEach((track, index) => {
           // Create Howl instance
-          howls[track.title] = new Howl({
+          const howl = new Howl({
             src: [track.file],
             loop: true,
             volume: 1.0
           });
+          howls.push(howl);
       
           // Create a waveform container
           const waveformContainer = document.createElement('div');
           waveformContainer.id = `waveform-${index}`;
           waveformContainer.style.width = '100%';
+          waveformContainer.style.overflowX = 'scroll';
+          waveformContainer.style.border = '1px solid #ccc';
+          waveformContainer.style.marginTop = '10px';
       
           // Create track UI
           const trackDiv = document.createElement('div');
           trackDiv.classList.add('track');
           trackDiv.innerHTML = `
             <strong>${track.title}</strong>
-            <button data-track="${track.title}" class="play-pause">Play</button>
-            <button data-track="${track.title}" class="mute">Mute</button>
             <input data-track="${track.title}" type="range" class="volume" min="0" max="1" step="0.1" value="1">
           `;
           trackDiv.appendChild(waveformContainer);
           container.appendChild(trackDiv);
       
-          // Create WaveSurfer instance
-          waveforms[track.title] = WaveSurfer.create({
+          // Initialize WaveSurfer
+          const waveform = WaveSurfer.create({
             container: `#waveform-${index}`,
             waveColor: '#ddd',
             progressColor: '#225588',
             responsive: true,
-            height: 50
+            height: 50,
+            scrollParent: true // Enable scrolling for waveforms
           });
+          waveform.load(track.file);
+          waveforms.push(waveform);
       
-          waveforms[track.title].load(track.file);
+          // Synchronize seeking across all tracks
+          waveform.on('seek', (progress) => {
+            const seekTime = progress * howl.duration();
+            howls.forEach(h => h.seek(seekTime));
+            waveforms.forEach(w => w.seekTo(progress));
+          });
         });
       
-        // Add event listeners
-        container.addEventListener('click', (e) => {
-          const trackName = e.target.dataset.track;
-      
-          if (e.target.classList.contains('play-pause')) {
-            const howl = howls[trackName];
-            if (howl.playing()) {
-              howl.pause();
-              e.target.textContent = 'Play';
-            } else {
-              howl.play();
-              e.target.textContent = 'Pause';
-            }
-          }
-      
-          if (e.target.classList.contains('mute')) {
-            const howl = howls[trackName];
-            if (howl.volume() > 0) {
-              howl.volume(0);
-              e.target.textContent = 'Unmute';
-            } else {
-              howl.volume(1);
-              e.target.textContent = 'Mute';
-            }
+        // Create global Play/Pause button
+        const playPauseButton = document.createElement('button');
+        playPauseButton.textContent = 'Play';
+        playPauseButton.style.marginBottom = '20px';
+        playPauseButton.addEventListener('click', () => {
+          const isPlaying = howls.some(h => h.playing());
+          if (isPlaying) {
+            howls.forEach(h => h.pause());
+            playPauseButton.textContent = 'Play';
+          } else {
+            howls.forEach(h => h.play());
+            playPauseButton.textContent = 'Pause';
           }
         });
+        container.prepend(playPauseButton);
       
+        // Volume controls
         container.addEventListener('input', (e) => {
           if (e.target.classList.contains('volume')) {
             const trackName = e.target.dataset.track;
-            const howl = howls[trackName];
-            howl.volume(parseFloat(e.target.value));
+            const index = tracks.findIndex(t => t.title === trackName);
+            if (index !== -1) {
+              howls[index].volume(parseFloat(e.target.value));
+            }
           }
         });
       }
