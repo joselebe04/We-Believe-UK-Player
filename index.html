@@ -18,65 +18,83 @@
       .then(response => response.json())
       .then(data => initPlayer(data));
 
-    function initPlayer(tracks) {
-      const container = document.getElementById('tracks');
-      const howls = {};
-
-      tracks.forEach((track, index) => {
-        // Create a Howl instance for each track
-        howls[track.title] = new Howl({
-          src: [track.file],
-          loop: true,
-          volume: 1.0
+      function initPlayer(tracks) {
+        const container = document.getElementById('tracks');
+        const howls = {};
+        const waveforms = {};
+      
+        tracks.forEach((track, index) => {
+          // Create Howl instance
+          howls[track.title] = new Howl({
+            src: [track.file],
+            loop: true,
+            volume: 1.0
+          });
+      
+          // Create a waveform container
+          const waveformContainer = document.createElement('div');
+          waveformContainer.id = `waveform-${index}`;
+          waveformContainer.style.width = '100%';
+      
+          // Create track UI
+          const trackDiv = document.createElement('div');
+          trackDiv.classList.add('track');
+          trackDiv.innerHTML = `
+            <strong>${track.title}</strong>
+            <button data-track="${track.title}" class="play-pause">Play</button>
+            <button data-track="${track.title}" class="mute">Mute</button>
+            <input data-track="${track.title}" type="range" class="volume" min="0" max="1" step="0.1" value="1">
+          `;
+          trackDiv.appendChild(waveformContainer);
+          container.appendChild(trackDiv);
+      
+          // Create WaveSurfer instance
+          waveforms[track.title] = WaveSurfer.create({
+            container: `#waveform-${index}`,
+            waveColor: '#ddd',
+            progressColor: '#225588',
+            responsive: true,
+            height: 50
+          });
+      
+          waveforms[track.title].load(track.file);
         });
-
-        // Build the UI for each track
-        const trackDiv = document.createElement('div');
-        trackDiv.classList.add('track');
-        trackDiv.innerHTML = `
-          <strong>${track.title}</strong>
-          <button data-track="${track.title}" class="play-pause">Play</button>
-          <button data-track="${track.title}" class="mute">Mute</button>
-          <input data-track="${track.title}" type="range" class="volume" min="0" max="1" step="0.1" value="1">
-        `;
-        container.appendChild(trackDiv);
-      });
-
-      // Add event listeners
-      container.addEventListener('click', (e) => {
-        const trackName = e.target.dataset.track;
-
-        if (e.target.classList.contains('play-pause')) {
-          const howl = howls[trackName];
-          if (howl.playing()) {
-            howl.pause();
-            e.target.textContent = 'Play';
-          } else {
-            howl.play();
-            e.target.textContent = 'Pause';
-          }
-        }
-
-        if (e.target.classList.contains('mute')) {
-          const howl = howls[trackName];
-          if (howl.volume() > 0) {
-            howl.volume(0);
-            e.target.textContent = 'Unmute';
-          } else {
-            howl.volume(1);
-            e.target.textContent = 'Mute';
-          }
-        }
-      });
-
-      container.addEventListener('input', (e) => {
-        if (e.target.classList.contains('volume')) {
+      
+        // Add event listeners
+        container.addEventListener('click', (e) => {
           const trackName = e.target.dataset.track;
-          const howl = howls[trackName];
-          howl.volume(parseFloat(e.target.value));
-        }
-      });
-    }
+      
+          if (e.target.classList.contains('play-pause')) {
+            const howl = howls[trackName];
+            if (howl.playing()) {
+              howl.pause();
+              e.target.textContent = 'Play';
+            } else {
+              howl.play();
+              e.target.textContent = 'Pause';
+            }
+          }
+      
+          if (e.target.classList.contains('mute')) {
+            const howl = howls[trackName];
+            if (howl.volume() > 0) {
+              howl.volume(0);
+              e.target.textContent = 'Unmute';
+            } else {
+              howl.volume(1);
+              e.target.textContent = 'Mute';
+            }
+          }
+        });
+      
+        container.addEventListener('input', (e) => {
+          if (e.target.classList.contains('volume')) {
+            const trackName = e.target.dataset.track;
+            const howl = howls[trackName];
+            howl.volume(parseFloat(e.target.value));
+          }
+        });
+      }
   </script>
 </body>
 </html>
