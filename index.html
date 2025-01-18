@@ -42,14 +42,18 @@
         .waveform-container {
             display: flex;
             align-items: center;
+            position: relative;
+            height: 60px;
         }
 
         .waveform {
             flex: 1;
-            height: 40px;
+            height: 100%;
             margin-left: 10px;
             background: #ccc;
             border-radius: 4px;
+            position: relative;
+            overflow: hidden;
         }
 
         .waveform:hover {
@@ -57,14 +61,23 @@
             cursor: pointer;
         }
 
+        .locator-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: red;
+            pointer-events: none;
+        }
+
         .volume-container {
             display: flex;
             align-items: center;
+            margin-top: 5px;
         }
 
         .volume-container input[type="range"] {
-            margin-left: 10px;
-            flex: 1;
+            width: 80px;
         }
 
         .mute-btn {
@@ -114,7 +127,9 @@
                 <span>Soprano</span>
                 <div class="waveform-container">
                     <button class="mute-btn" data-track="soprano">Mute</button>
-                    <div class="waveform" data-track="soprano"></div>
+                    <div class="waveform" data-track="soprano">
+                        <div class="locator-line" id="locator-soprano"></div>
+                    </div>
                 </div>
                 <div class="volume-container">
                     <input type="range" class="volume-slider" data-track="soprano" min="0" max="100" value="100">
@@ -125,7 +140,9 @@
                 <span>Alto</span>
                 <div class="waveform-container">
                     <button class="mute-btn" data-track="alto">Mute</button>
-                    <div class="waveform" data-track="alto"></div>
+                    <div class="waveform" data-track="alto">
+                        <div class="locator-line" id="locator-alto"></div>
+                    </div>
                 </div>
                 <div class="volume-container">
                     <input type="range" class="volume-slider" data-track="alto" min="0" max="100" value="100">
@@ -136,7 +153,9 @@
                 <span>Tenor</span>
                 <div class="waveform-container">
                     <button class="mute-btn" data-track="tenor">Mute</button>
-                    <div class="waveform" data-track="tenor"></div>
+                    <div class="waveform" data-track="tenor">
+                        <div class="locator-line" id="locator-tenor"></div>
+                    </div>
                 </div>
                 <div class="volume-container">
                     <input type="range" class="volume-slider" data-track="tenor" min="0" max="100" value="100">
@@ -147,7 +166,9 @@
                 <span>Bass</span>
                 <div class="waveform-container">
                     <button class="mute-btn" data-track="bass">Mute</button>
-                    <div class="waveform" data-track="bass"></div>
+                    <div class="waveform" data-track="bass">
+                        <div class="locator-line" id="locator-bass"></div>
+                    </div>
                 </div>
                 <div class="volume-container">
                     <input type="range" class="volume-slider" data-track="bass" min="0" max="100" value="100">
@@ -162,7 +183,8 @@
             const timestamp = document.getElementById("timestamp");
             const muteButtons = document.querySelectorAll(".mute-btn");
             const volumeSliders = document.querySelectorAll(".volume-slider");
-            
+            const waveforms = document.querySelectorAll(".waveform");
+
             let isPlaying = false;
             let tracks = {
                 soprano: new Audio("Tracks/Soprano.mp3"),
@@ -184,6 +206,15 @@
                 timestamp.textContent = `${minutes}:${seconds}`;
             };
 
+            const updateLocatorLines = () => {
+                Object.keys(tracks).forEach(trackName => {
+                    const track = tracks[trackName];
+                    const locator = document.getElementById(`locator-${trackName}`);
+                    const progress = (track.currentTime / track.duration) * 100;
+                    locator.style.left = `${progress}%`;
+                });
+            };
+
             playPauseBtn.addEventListener("click", () => {
                 isPlaying = !isPlaying;
                 playPauseBtn.textContent = isPlaying ? "Pause" : "Play";
@@ -191,7 +222,10 @@
                     isPlaying ? track.play() : track.pause();
                 });
                 if (isPlaying) {
-                    setInterval(updateTimestamp, 500);
+                    setInterval(() => {
+                        updateTimestamp();
+                        updateLocatorLines();
+                    }, 500);
                 }
             });
 
@@ -209,12 +243,39 @@
                     const track = tracks[e.target.dataset.track];
                     const volume = e.target.value / 100;
                     track.volume = volume;
-                    track.muted = volume === 0;
+            
+                    // Update mute button if volume is set to 0
                     const muteButton = document.querySelector(`.mute-btn[data-track="${e.target.dataset.track}"]`);
-                    muteButton.textContent = volume === 0 ? "Unmute" : "Mute";
+                    if (volume === 0) {
+                        track.muted = true;
+                        muteButton.textContent = "Unmute";
+                    } else {
+                        track.muted = false;
+                        muteButton.textContent = "Mute";
+                    }
                 });
             });
-        });
+            
+            waveforms.forEach(waveform => {
+                waveform.addEventListener("click", (e) => {
+                    const track = tracks[e.target.dataset.track];
+                    const rect = e.target.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const clickPosition = clickX / rect.width;
+                    const newTime = track.duration * clickPosition;
+            
+                    // Sync all tracks to the clicked time
+                    Object.values(tracks).forEach(t => t.currentTime = newTime);
+                });
+            });
+            
+            // Synchronize all tracks when one ends
+            Object.values(tracks).forEach(track => {
+                track.addEventListener("ended", () => {
+                    isPlaying = false;
+                    playPauseBtn.textContent = "Play";
+                });
+            });
     </script>
 </body>
 </html>
