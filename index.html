@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Choir Audio Player</title>
+    <script src="https://unpkg.com/wavesurfer.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,21 +23,19 @@
             border-radius: 8px;
             padding: 10px;
             width: 90%;
-            max-width: 400px;
+            max-width: 600px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .controls {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             align-items: center;
         }
 
         .track {
-            margin-bottom: 10px;
-            display: flex;
-            flex-direction: column;
+            margin-bottom: 20px;
         }
 
         .waveform-container {
@@ -48,36 +47,20 @@
 
         .waveform {
             flex: 1;
-            height: 100%;
             margin-left: 10px;
-            background: #ccc;
-            border-radius: 4px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .waveform:hover {
-            background: #225588;
-            cursor: pointer;
-        }
-
-        .locator-line {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background-color: red;
-            pointer-events: none;
         }
 
         .volume-container {
             display: flex;
             align-items: center;
-            margin-top: 5px;
+            margin-left: 10px;
         }
 
         .volume-container input[type="range"] {
-            width: 80px;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            width: 100px;
+            margin-top: 20px;
         }
 
         .mute-btn {
@@ -109,7 +92,7 @@
         }
 
         .timestamp {
-            font-size: 12px;
+            font-size: 14px;
             text-align: right;
             color: #666;
         }
@@ -121,161 +104,106 @@
             <button id="playPauseBtn" class="play-btn">Play</button>
             <span id="timestamp" class="timestamp">0:00</span>
         </div>
-        
-        <div id="tracksContainer">
-            <div class="track" id="soprano">
-                <span>Soprano</span>
-                <div class="waveform-container">
-                    <button class="mute-btn" data-track="soprano">Mute</button>
-                    <div class="waveform" data-track="soprano">
-                        <div class="locator-line" id="locator-soprano"></div>
-                    </div>
-                </div>
-                <div class="volume-container">
-                    <input type="range" class="volume-slider" data-track="soprano" min="0" max="100" value="100">
-                </div>
-            </div>
-            
-            <div class="track" id="alto">
-                <span>Alto</span>
-                <div class="waveform-container">
-                    <button class="mute-btn" data-track="alto">Mute</button>
-                    <div class="waveform" data-track="alto">
-                        <div class="locator-line" id="locator-alto"></div>
-                    </div>
-                </div>
-                <div class="volume-container">
-                    <input type="range" class="volume-slider" data-track="alto" min="0" max="100" value="100">
-                </div>
-            </div>
-
-            <div class="track" id="tenor">
-                <span>Tenor</span>
-                <div class="waveform-container">
-                    <button class="mute-btn" data-track="tenor">Mute</button>
-                    <div class="waveform" data-track="tenor">
-                        <div class="locator-line" id="locator-tenor"></div>
-                    </div>
-                </div>
-                <div class="volume-container">
-                    <input type="range" class="volume-slider" data-track="tenor" min="0" max="100" value="100">
-                </div>
-            </div>
-
-            <div class="track" id="bass">
-                <span>Bass</span>
-                <div class="waveform-container">
-                    <button class="mute-btn" data-track="bass">Mute</button>
-                    <div class="waveform" data-track="bass">
-                        <div class="locator-line" id="locator-bass"></div>
-                    </div>
-                </div>
-                <div class="volume-container">
-                    <input type="range" class="volume-slider" data-track="bass" min="0" max="100" value="100">
-                </div>
-            </div>
-        </div>
+        <div id="tracksContainer"></div>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const playPauseBtn = document.getElementById("playPauseBtn");
             const timestamp = document.getElementById("timestamp");
-            const muteButtons = document.querySelectorAll(".mute-btn");
-            const volumeSliders = document.querySelectorAll(".volume-slider");
-            const waveforms = document.querySelectorAll(".waveform");
+            const tracksContainer = document.getElementById("tracksContainer");
 
+            const trackData = [
+                { name: "Soprano", file: "Tracks/Soprano.mp3" },
+                { name: "Alto", file: "Tracks/Alto.mp3" },
+                { name: "Tenor", file: "Tracks/Tenor.mp3" },
+                { name: "Bass", file: "Tracks/Bass.mp3" }
+            ];
+
+            let waveSurfers = {};
             let isPlaying = false;
-            let tracks = {
-                soprano: new Audio("Tracks/Soprano.mp3"),
-                alto: new Audio("Tracks/Alto.mp3"),
-                tenor: new Audio("Tracks/Tenor.mp3"),
-                bass: new Audio("Tracks/Bass.mp3")
+
+            const createTrackElement = (track) => {
+                const trackElement = document.createElement("div");
+                trackElement.className = "track";
+
+                const trackHeader = document.createElement("span");
+                trackHeader.textContent = track.name;
+                trackElement.appendChild(trackHeader);
+
+                const waveformContainer = document.createElement("div");
+                waveformContainer.className = "waveform-container";
+
+                const muteBtn = document.createElement("button");
+                muteBtn.className = "mute-btn";
+                muteBtn.textContent = "Mute";
+                muteBtn.dataset.track = track.name.toLowerCase();
+                waveformContainer.appendChild(muteBtn);
+
+                const waveformDiv = document.createElement("div");
+                waveformDiv.className = "waveform";
+                waveformDiv.id = `waveform-${track.name.toLowerCase()}`;
+                waveformContainer.appendChild(waveformDiv);
+
+                const volumeContainer = document.createElement("div");
+                volumeContainer.className = "volume-container";
+
+                const volumeSlider = document.createElement("input");
+                volumeSlider.type = "range";
+                volumeSlider.min = 0;
+                volumeSlider.max = 100;
+                volumeSlider.value = 100;
+                volumeSlider.dataset.track = track.name.toLowerCase();
+                volumeContainer.appendChild(volumeSlider);
+
+                waveformContainer.appendChild(volumeContainer);
+                trackElement.appendChild(waveformContainer);
+
+                tracksContainer.appendChild(trackElement);
+
+                return { muteBtn, volumeSlider, waveformDiv };
             };
 
-            const syncTracks = () => {
-                const currentTime = tracks.soprano.currentTime;
-                Object.values(tracks).forEach(track => {
-                    track.currentTime = currentTime;
+            trackData.forEach((track) => {
+                const { muteBtn, volumeSlider, waveformDiv } = createTrackElement(track);
+
+                const waveSurfer = WaveSurfer.create({
+                    container: `#${waveformDiv.id}`,
+                    waveColor: "#ccc",
+                    progressColor: "#225588",
+                    height: 60,
+                    responsive: true,
                 });
-            };
 
-            const updateTimestamp = () => {
-                const minutes = Math.floor(tracks.soprano.currentTime / 60);
-                const seconds = Math.floor(tracks.soprano.currentTime % 60).toString().padStart(2, "0");
-                timestamp.textContent = `${minutes}:${seconds}`;
-            };
+                waveSurfer.load(track.file);
+                waveSurfers[track.name.toLowerCase()] = waveSurfer;
 
-            const updateLocatorLines = () => {
-                Object.keys(tracks).forEach(trackName => {
-                    const track = tracks[trackName];
-                    const locator = document.getElementById(`locator-${trackName}`);
-                    const progress = (track.currentTime / track.duration) * 100;
-                    locator.style.left = `${progress}%`;
+                muteBtn.addEventListener("click", () => {
+                    waveSurfer.setMute(!waveSurfer.getMute());
+                    muteBtn.textContent = waveSurfer.getMute() ? "Unmute" : "Mute";
                 });
-            };
+
+                volumeSlider.addEventListener("input", (e) => {
+                    waveSurfer.setVolume(e.target.value / 100);
+                });
+            });
 
             playPauseBtn.addEventListener("click", () => {
                 isPlaying = !isPlaying;
                 playPauseBtn.textContent = isPlaying ? "Pause" : "Play";
-                Object.values(tracks).forEach(track => {
-                    isPlaying ? track.play() : track.pause();
-                });
-                if (isPlaying) {
-                    setInterval(() => {
-                        updateTimestamp();
-                        updateLocatorLines();
-                    }, 500);
-                }
-            });
 
-            muteButtons.forEach(button => {
-                button.addEventListener("click", (e) => {
-                    const track = tracks[e.target.dataset.track];
-                    const isMuted = track.muted;
-                    track.muted = !isMuted;
-                    e.target.textContent = isMuted ? "Mute" : "Unmute";
+                Object.values(waveSurfers).forEach((waveSurfer) => {
+                    isPlaying ? waveSurfer.play() : waveSurfer.pause();
                 });
             });
 
-            volumeSliders.forEach(slider => {
-                slider.addEventListener("input", (e) => {
-                    const track = tracks[e.target.dataset.track];
-                    const volume = e.target.value / 100;
-                    track.volume = volume;
-            
-                    // Update mute button if volume is set to 0
-                    const muteButton = document.querySelector(`.mute-btn[data-track="${e.target.dataset.track}"]`);
-                    if (volume === 0) {
-                        track.muted = true;
-                        muteButton.textContent = "Unmute";
-                    } else {
-                        track.muted = false;
-                        muteButton.textContent = "Mute";
-                    }
-                });
-            });
-            
-            waveforms.forEach(waveform => {
-                waveform.addEventListener("click", (e) => {
-                    const track = tracks[e.target.dataset.track];
-                    const rect = e.target.getBoundingClientRect();
-                    const clickX = e.clientX - rect.left;
-                    const clickPosition = clickX / rect.width;
-                    const newTime = track.duration * clickPosition;
-            
-                    // Sync all tracks to the clicked time
-                    Object.values(tracks).forEach(t => t.currentTime = newTime);
-                });
-            });
-            
-            // Synchronize all tracks when one ends
-            Object.values(tracks).forEach(track => {
-                track.addEventListener("ended", () => {
-                    isPlaying = false;
-                    playPauseBtn.textContent = "Play";
-                });
-            });
+            setInterval(() => {
+                const currentTime = waveSurfers.soprano.getCurrentTime();
+                const minutes = Math.floor(currentTime / 60);
+                const seconds = Math.floor(currentTime % 60).toString().padStart(2, "0");
+                timestamp.textContent = `${minutes}:${seconds}`;
+            }, 500);
+        });
     </script>
 </body>
 </html>
