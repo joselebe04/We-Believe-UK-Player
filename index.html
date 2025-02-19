@@ -32,30 +32,36 @@
 </head>
 <body>
     <div class="player-container">
-        <button class="play-pause-button">Play</button>
-        <div class="current-time">0:00</div>
         <audio id="universal-player" class="plyr" controls>
-            <source src="./https://joselebe04.github.io/We-Believe-UK-Player/Soprano.mp3" type="audio/mp3">
+            <source src="Website 2 Soprano/Soprano.mp3" type="audio/mp3">
         </audio>
 
         <div class="track" data-src="./https://joselebe04.github.io/We-Believe-UK-Player/Soprano.mp3">
             <span class="track-title">Soprano</span>
-            <audio class="sync-audio"></audio>
+            <audio class="sync-audio" controls></audio>
+            <input type="range" class="volume-slider" min="0" max="1" step="0.01">
+            <button class="mute">Mute</button>
         </div>
         
         <div class="track" data-src="./https://joselebe04.github.io/We-Believe-UK-Player/Alto.mp3">
             <span class="track-title">Alto</span>
-            <audio class="sync-audio"></audio>
+            <audio class="sync-audio" controls></audio>
+            <input type="range" class="volume-slider" min="0" max="1" step="0.01">
+            <button class="mute">Mute</button>
         </div>
         
         <div class="track" data-src="./https://joselebe04.github.io/We-Believe-UK-Player/Tenor.mp3">
             <span class="track-title">Tenor</span>
-            <audio class="sync-audio"></audio>
+            <audio class="sync-audio" controls></audio>
+            <input type="range" class="volume-slider" min="0" max="1" step="0.01">
+            <button class="mute">Mute</button>
         </div>
         
         <div class="track" data-src="./https://joselebe04.github.io/We-Believe-UK-Player/Bass.mp3">
             <span class="track-title">Bass</span>
-            <audio class="sync-audio"></audio>
+            <audio class="sync-audio" controls></audio>
+            <input type="range" class="volume-slider" min="0" max="1" step="0.01">
+            <button class="mute">Mute</button>
         </div>
     </div>
 
@@ -64,39 +70,36 @@
         const universalPlayer = new Plyr('#universal-player', {
             controls: ['play', 'progress', 'current-time', 'mute', 'volume'],
         });
-        const playPauseButton = document.querySelector('.play-pause-button');
-        const currentTimeDisplay = document.querySelector('.current-time');
-        let isPlaying = false;
-
+        
         const audioTracks = document.querySelectorAll('.sync-audio');
+        const volumeSliders = document.querySelectorAll('.volume-slider');
+        const muteButtons = document.querySelectorAll('.mute');
+        
         audioTracks.forEach((audio, index) => {
             audio.src = document.querySelectorAll('.track')[index].getAttribute('data-src');
         });
-
-        playPauseButton.addEventListener('click', () => {
-            if (isPlaying) {
-                universalPlayer.pause();
-                audioTracks.forEach(track => track.pause());
-                playPauseButton.textContent = 'Play';
-            } else {
-                universalPlayer.play();
-                audioTracks.forEach(track => track.play());
-                playPauseButton.textContent = 'Pause';
-            }
-            isPlaying = !isPlaying;
-        });
-
+        
         universalPlayer.on('timeupdate', () => {
             const newTime = universalPlayer.currentTime;
             audioTracks.forEach(track => track.currentTime = newTime);
-            const minutes = Math.floor(newTime / 60);
-            const seconds = Math.floor(newTime % 60).toString().padStart(2, '0');
-            currentTimeDisplay.textContent = `${minutes}:${seconds}`;
         });
-
+        
         universalPlayer.on('seeked', () => {
             const newTime = universalPlayer.currentTime;
             audioTracks.forEach(track => track.currentTime = newTime);
+        });
+        
+        volumeSliders.forEach((slider, index) => {
+            slider.addEventListener('input', () => {
+                audioTracks[index].volume = slider.value;
+            });
+        });
+        
+        muteButtons.forEach((button, index) => {
+            button.addEventListener('click', () => {
+                audioTracks[index].muted = !audioTracks[index].muted;
+                button.textContent = audioTracks[index].muted ? 'Unmute' : 'Mute';
+            });
         });
     </script>
 </body>
