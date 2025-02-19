@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choir Player</title>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            text-align: center;
+        }
+        .player-container {
+            width: 80%;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .track {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Choir Player</h2>
+
+    <div class="player-container">
+        <div class="track">
+            <label>Soprano</label>
+            <audio class="player" controls>
+                <source src="audio/soprano.mp3" type="audio/mp3">
+            </audio>
+        </div>
+        <div class="track">
+            <label>Alto</label>
+            <audio class="player" controls>
+                <source src="audio/alto.mp3" type="audio/mp3">
+            </audio>
+        </div>
+        <div class="track">
+            <label>Tenor</label>
+            <audio class="player" controls>
+                <source src="audio/tenor.mp3" type="audio/mp3">
+            </audio>
+        </div>
+        <div class="track">
+            <label>Bass</label>
+            <audio class="player" controls>
+                <source src="audio/bass.mp3" type="audio/mp3">
+            </audio>
+        </div>
+    </div>
+
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const players = document.querySelectorAll('.player');
+            players.forEach(player => new Plyr(player));
+        });
+    </script>
+
+</body>
+</html>
