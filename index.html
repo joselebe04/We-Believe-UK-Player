@@ -11,64 +11,22 @@
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
             display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
 
         .player-container {
             background-color: #fff;
-            border: 1px solid #ddd;
-            padding: 5px;
-            width: 360px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .play-pause-button {
-            display: block;
-            margin: 0 auto 20px;
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #225588;
-            color: white;
-            border: none;
-            cursor: pointer;
+            border-radius: 10px;
+            padding: 20px;
+            width: 400px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
         .track {
-            display: flex;
-            align-items: center;
-            margin-bottom: 2px;
-            margin-right: 3px;
-        }
-
-        .track-title {
-            width: 60px;
-            text-align: left;
-            margin-right: 2px;
-        }
-
-        .buttons {
-            margin-left: 10px;
-        }
-
-        .buttons button {
-            padding: 5px 10px;
-            margin-right: 5px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .buttons button.mute {
-            background-color: #ddd;
-            color: black;
-        }
-
-        .buttons button.mute.active {
-            background-color: #225588;
-            color: white;
-        }
-
-        .volume-slider {
-            margin-left: 5px;
-            width: 50px;
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -78,38 +36,22 @@
 
         <div class="track">
             <span class="track-title">Soprano</span>
-            <audio class="plyr" src="./https://joselebe04.github.io/We-Believe-UK-Player/Soprano.mp3"></audio>
-            <div class="buttons">
-                <button class="mute">Mute</button>
-            </div>
-            <input type="range" class="volume-slider" min="0" max="1" step="0.01">
+            <audio class="plyr" controls src="./https://joselebe04.github.io/We-Believe-UK-Player/Soprano.mp3"></audio>
         </div>
 
         <div class="track">
             <span class="track-title">Alto</span>
-            <audio class="plyr" src="./https://joselebe04.github.io/We-Believe-UK-Player/Alto.mp3"></audio>
-            <div class="buttons">
-                <button class="mute">Mute</button>
-            </div>
-            <input type="range" class="volume-slider" min="0" max="1" step="0.01">
+            <audio class="plyr" controls src="./https://joselebe04.github.io/We-Believe-UK-Player/Alto.mp3"></audio>
         </div>
 
         <div class="track">
             <span class="track-title">Tenor</span>
-            <audio class="plyr" src="./https://joselebe04.github.io/We-Believe-UK-Player/Tenor.mp3"></audio>
-            <div class="buttons">
-                <button class="mute">Mute</button>
-            </div>
-            <input type="range" class="volume-slider" min="0" max="1" step="0.01">
+            <audio class="plyr" controls src=".https://joselebe04.github.io/We-Believe-UK-Player/Tenor.mp3"></audio>
         </div>
 
         <div class="track">
             <span class="track-title">Bass</span>
-            <audio class="plyr" src="./https://joselebe04.github.io/We-Believe-UK-Player/Bass.mp3"></audio>
-            <div class="buttons">
-                <button class="mute">Mute</button>
-            </div>
-            <input type="range" class="volume-slider" min="0" max="1" step="0.01">
+            <audio class="plyr" controls src="./https://joselebe04.github.io/We-Believe-UK-Player/Bass.mp3"></audio>
         </div>
     </div>
 
@@ -117,8 +59,6 @@
     <script>
         const players = Array.from(document.querySelectorAll('.plyr')).map(p => new Plyr(p));
         const playPauseButton = document.querySelector('.play-pause-button');
-        const muteButtons = document.querySelectorAll('.mute');
-        const volumeSliders = document.querySelectorAll('.volume-slider');
         let isPlaying = false;
         
         playPauseButton.addEventListener('click', () => {
@@ -130,20 +70,6 @@
                 playPauseButton.textContent = 'Pause';
             }
             isPlaying = !isPlaying;
-        });
-        
-        muteButtons.forEach((button, index) => {
-            button.addEventListener('click', () => {
-                const player = players[index];
-                player.muted = !player.muted;
-                button.classList.toggle('active', player.muted);
-            });
-        });
-
-        volumeSliders.forEach((slider, index) => {
-            slider.addEventListener('input', () => {
-                players[index].volume = slider.value;
-            });
         });
     </script>
 </body>
