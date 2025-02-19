@@ -7,51 +7,73 @@
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <style>
         body {
+            margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            text-align: center;
+            background-color: #f0f0f0;
+            display: flex;
         }
+
         .player-container {
-            width: 80%;
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 5px;
+            width: 360px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+
+        .play-pause-button {
+            display: block;
+            margin: 0 auto 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #225588;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
         .track {
+            display: flex;
+            align-items: center;
             margin-bottom: 10px;
+        }
+
+        .track-title {
+            width: 60px;
+            text-align: left;
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
-
-    <h2>Choir Player</h2>
-
     <div class="player-container">
+        <button class="play-pause-button">Play</button>
+        
         <div class="track">
-            <label>Soprano</label>
+            <span class="track-title">Soprano</span>
             <audio class="player" controls>
-                <source src="audio/soprano.mp3" type="audio/mp3">
+                <source src="Website 2 Soprano/Soprano.mp3" type="audio/mp3">
             </audio>
         </div>
+        
         <div class="track">
-            <label>Alto</label>
+            <span class="track-title">Alto</span>
             <audio class="player" controls>
-                <source src="audio/alto.mp3" type="audio/mp3">
+                <source src="Website 3 Alto/Alto.mp3" type="audio/mp3">
             </audio>
         </div>
+        
         <div class="track">
-            <label>Tenor</label>
+            <span class="track-title">Tenor</span>
             <audio class="player" controls>
-                <source src="audio/tenor.mp3" type="audio/mp3">
+                <source src="Website 4 Tenor/Tenor.mp3" type="audio/mp3">
             </audio>
         </div>
+        
         <div class="track">
-            <label>Bass</label>
+            <span class="track-title">Bass</span>
             <audio class="player" controls>
-                <source src="audio/bass.mp3" type="audio/mp3">
+                <source src="Website 5 Bass/Bass.mp3" type="audio/mp3">
             </audio>
         </div>
     </div>
@@ -63,6 +85,5 @@
             players.forEach(player => new Plyr(player));
         });
     </script>
-
 </body>
 </html>
