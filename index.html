@@ -26,50 +26,67 @@
         }
 
         .track {
-            display: none; /* Hide individual controls */
+            margin-bottom: 15px;
         }
     </style>
 </head>
 <body>
     <div class="player-container">
         <button class="play-pause-button">Play</button>
-        <audio id="universal-player" class="plyr" controls>
-            <source src="./https://joselebe04.github.io/We-Believe-UK-Player/Soprano.mp3" type="audio/mp3">
-        </audio>
+        
+        <div class="track" data-src="./https://joselebe04.github.io/We-Believe-UK-Player/Soprano.mp3">
+            <span class="track-title">Soprano</span>
+            <audio class="plyr" controls></audio>
+        </div>
+        
+        <div class="track" data-src="./https://joselebe04.github.io/We-Believe-UK-Player/Alto.mp3">
+            <span class="track-title">Alto</span>
+            <audio class="plyr" controls></audio>
+        </div>
+        
+        <div class="track" data-src="./https://joselebe04.github.io/We-Believe-UK-Player/Tenor.mp3">
+            <span class="track-title">Tenor</span>
+            <audio class="plyr" controls></audio>
+        </div>
+        
+        <div class="track" data-src="./https://joselebe04.github.io/We-Believe-UK-Player/Bass.mp3">
+            <span class="track-title">Bass</span>
+            <audio class="plyr" controls></audio>
+        </div>
     </div>
 
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
-        const player = new Plyr('#universal-player', {
-            controls: ['play', 'progress', 'current-time', 'mute', 'volume'], // Removed speed control
+        const tracks = document.querySelectorAll('.track');
+        const players = [];
+        tracks.forEach(track => {
+            const audio = track.querySelector('audio');
+            audio.src = track.getAttribute('data-src');
+            const player = new Plyr(audio, {
+                controls: ['play', 'progress', 'current-time', 'mute', 'volume'],
+            });
+            players.push(player);
         });
+
         const playPauseButton = document.querySelector('.play-pause-button');
         let isPlaying = false;
-        
-        const audioTracks = [
-            new Audio("./https://joselebe04.github.io/We-Believe-UK-Player/Soprano.mp3"),
-            new Audio("./https://joselebe04.github.io/We-Believe-UK-Player/Alto.mp3"),
-            new Audio("./https://joselebe04.github.io/We-Believe-UK-Player/Tenor.mp3"),
-            new Audio("./https://joselebe04.github.io/We-Believe-UK-Player/Bass.mp3")
-        ];
-        
+
         playPauseButton.addEventListener('click', () => {
             if (isPlaying) {
-                audioTracks.forEach(track => track.pause());
+                players.forEach(player => player.pause());
                 playPauseButton.textContent = 'Play';
             } else {
-                audioTracks.forEach(track => track.play());
+                players.forEach(player => player.play());
                 playPauseButton.textContent = 'Pause';
             }
             isPlaying = !isPlaying;
         });
-        
-        player.on('timeupdate', () => {
-            audioTracks.forEach(track => track.currentTime = player.currentTime);
-        });
 
-        player.on('seeked', () => {
-            audioTracks.forEach(track => track.currentTime = player.currentTime);
+        players.forEach(player => {
+            player.on('seeked', () => {
+                const newTime = player.currentTime;
+                players.forEach(p => p.currentTime = newTime);
+            });
         });
     </script>
 </body>
